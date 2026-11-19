@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>更多边界情况</title>
+<meta name="description" content="给第一讲当链接目标，并把内容藏进折叠块、选项卡和演示里。">
+<link rel="stylesheet" href="template/zhixu.css">
+<script src="template/zhixu.js"></script>
+</head>
+<body>
+<main id="page-top">
+<h1>更多边界情况</h1>
+<p class="lead">给第一讲当链接目标，并把内容藏进折叠块、选项卡和演示里，检查搜索能不能找到它们并把它们亮出来。</p>
+<section id="anchors">
+<h2>被引用的小节</h2>
+<p>第一讲的链接指向这里。这里定义术语 <dfn data-def="解决一类问题的、有限且明确的步骤。">算法</dfn>。</p>
+<p>作者自己写的 id 归作者：<code>&lt;main&gt;</code> 上有一个，这条旁注<span class="note" id="note-kept">这条旁注带着作者写的 id。</span>上也有一个。<a href="#page-top">回到页首</a>和<a href="#note-kept">看那条旁注</a>都要找得到目标。</p>
+</section>
+<section id="hidden">
+<h2>藏起来的内容</h2>
+<p>普通段落里有一个词：独角兽。还有一个被标签隔开的词：<strong>麒</strong>麟臂；以及大小写混着写的 CamelCase。</p>
+<details>
+<summary>收起的折叠块</summary>
+<p id="in-fold">折叠块里有一个词：独角鲸。</p>
+</details>
+<div class="tabs">
+<div data-tab="第一页"><p>第一页的内容。</p></div>
+<div data-tab="第二页"><p>第二页里有一个词：独角仙。</p></div>
+</div>
+<div class="stepper" data-title="两帧的演示">
+<figure>
+<div class="cells"><span class="on">1</span><span class="hit">2</span></div>
+<figcaption>第一帧。</figcaption>
+</figure>
+<figure>
+<div class="cells"><span class="off">1</span><span class="hit">2</span></div>
+<figcaption>第二帧里有一个词：独角犀。</figcaption>
+</figure>
+</div>
+</section>
+<section id="second-open">
+<h2>第二项展开的手风琴</h2>
+<details name="other">
+<summary>另一组手风琴的第一项</summary>
+<p>手风琴丙的正文。</p>
+</details>
+<details name="other" open>
+<summary>另一组手风琴的第二项（默认展开）</summary>
+<p>手风琴丁的正文。</p>
+</details>
+</section>
+</main>
+</body>
+</html>

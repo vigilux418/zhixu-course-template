@@ -1,0 +1,543 @@
+/* 知序 · 基础排版
+ * 这里只描述作者写下的原始 HTML：即使脚本没有运行，页面也能照常阅读。 */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  text-size-adjust: 100%;
+  scrollbar-gutter: stable; /* 页面有长有短，滚动条时有时无：一直给它留着位置，版面不横移 */
+  scroll-padding-top: calc(var(--header-h) + var(--s-4));
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-md);
+  line-height: var(--lh-snug);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+html [hidden] {
+  display: none;
+}
+
+/* —— 正文容器 —— */
+main {
+  --flow: 1.1em;
+  font-family: var(--font-read);
+  font-size: var(--t-md);
+  font-weight: var(--w-body);
+  line-height: var(--lh-body);
+  overflow-wrap: break-word;
+  line-break: strict;
+  text-autospace: normal;
+}
+
+html:not(.zx-js) main {
+  max-width: calc(var(--measure) + 2 * var(--s-5));
+  margin-inline: auto;
+  padding: var(--s-7) var(--s-5) var(--s-8);
+}
+
+/* 关掉脚本时没有人给宽表格套上滚动的容器：让表格自己横向滚动，不把整页撑宽 */
+html:not(.zx-js) main table {
+  display: block;
+  overflow-x: auto;
+}
+
+/* 所有块级内容共用同一个段距；特异性为零，组件可以直接改写 */
+main
+  :where(
+    p,
+    ul,
+    ol,
+    dl,
+    blockquote,
+    figure,
+    table,
+    pre,
+    details,
+    .callout,
+    .cards,
+    .example,
+    .quiz,
+    .stepper,
+    .tabs,
+    .figures
+  ) {
+  margin-block: 0 var(--flow);
+}
+
+/* —— 标题 —— */
+main h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--t-2xl);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  text-wrap: balance;
+}
+
+main h2 {
+  margin: var(--s-7) 0 var(--s-4);
+  color: var(--ink);
+  font-size: var(--t-xl);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  text-wrap: balance;
+}
+
+main h3 {
+  margin: var(--s-6) 0 var(--s-2);
+  color: var(--ink);
+  font-size: var(--t-lg);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+}
+
+main h4 {
+  margin: var(--s-5) 0 var(--s-1);
+  color: var(--ink);
+  font-size: var(--t-md);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+}
+
+/* —— 段落与行内 —— */
+main > p,
+section > p {
+  text-wrap: pretty;
+}
+
+/* 导语：手机上和正文一样大，免得它一段就占掉半屏；屏幕够宽时大一号 */
+.lead {
+  margin-top: var(--s-4);
+  color: var(--text);
+  line-height: 1.7;
+}
+
+/* 两端对齐只在行够长时用：窄屏上一行没几个字，遇到公式和长单词，字距会被拉得很开 */
+@media (min-width: 700px) {
+  main > p,
+  section > p {
+    text-align: justify;
+  }
+
+  .lead {
+    font-size: var(--t-lg);
+  }
+}
+
+main a {
+  color: var(--accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  transition: text-decoration-color var(--dur-1);
+}
+
+main a:hover {
+  text-decoration-color: currentColor;
+}
+
+main strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* 中文不用斜体：着重改用楷体 */
+main em {
+  font-family: var(--font-kai);
+  font-style: normal;
+}
+
+main mark {
+  padding-inline: 0.1em;
+  background: linear-gradient(transparent 58%, var(--mark-ink) 58%);
+  color: inherit;
+}
+
+main :not(pre) > code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--r-0);
+  background: var(--wash);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--em-sm);
+}
+
+main kbd {
+  padding: 0.1em 0.45em;
+  border: 1px solid var(--rule-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--r-1);
+  background: var(--raise);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--em-sm);
+}
+
+main sub,
+main sup {
+  font-size: var(--em-xs);
+  line-height: 0;
+}
+
+main abbr[title] {
+  text-decoration: underline dotted var(--muted);
+  cursor: help;
+}
+
+main dfn {
+  font-style: normal;
+  text-decoration: underline dotted var(--accent);
+  text-underline-offset: 0.22em;
+}
+
+main dfn[data-def] {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* 旁注在脚本接管之前，以括注的形式留在行内。限定为 span：提示卡也有一种类型叫 note */
+span.note {
+  color: var(--muted);
+  font-size: var(--em-sm);
+}
+
+span.note::before {
+  content: '（';
+}
+
+span.note::after {
+  content: '）';
+}
+
+/* —— 列表 —— */
+main ul,
+main ol {
+  padding-left: 1.6em;
+}
+
+main li {
+  margin-block: 0.3em;
+}
+
+main li::marker {
+  color: var(--muted);
+}
+
+main li > :where(ul, ol) {
+  margin-block: 0.3em 0;
+}
+
+main dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  border-bottom: 1px solid var(--rule);
+}
+
+main dt {
+  padding: 0.5em 1.4em 0.5em 0;
+  border-top: 1px solid var(--rule);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+main dd {
+  margin: 0;
+  padding-block: 0.5em;
+  border-top: 1px solid var(--rule);
+}
+
+/* —— 引文：楷体，两侧缩进 —— */
+main blockquote {
+  margin-inline: 2em;
+  font-family: var(--font-kai);
+}
+
+main blockquote > p {
+  margin-bottom: 0.4em;
+}
+
+main blockquote cite {
+  display: block;
+  color: var(--muted);
+  font-size: var(--t-sm);
+  font-style: normal;
+  text-align: right;
+}
+
+main blockquote cite::before {
+  content: '—— ';
+}
+
+main hr {
+  width: 30%;
+  margin: var(--s-6) auto;
+  border: 0;
+  border-top: 1px solid var(--rule-strong);
+}
+
+/* —— 表格：三线表 —— */
+main table {
+  width: 100%;
+  border-block: 2px solid var(--ink);
+  border-collapse: collapse;
+  font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-snug);
+}
+
+main caption {
+  padding-bottom: var(--s-2);
+  color: var(--muted);
+  font-size: var(--t-sm);
+  text-align: center;
+}
+
+main th,
+main td {
+  padding: 0.55em 0.9em;
+  text-align: left;
+  vertical-align: top;
+}
+
+/* 表头不折行：列再多，也不会把表头挤成一字一行 */
+main th {
+  white-space: nowrap;
+}
+
+main thead th {
+  border-bottom: 1px solid var(--ink);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+main tbody th {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+main tbody tr + tr > * {
+  border-top: 1px solid var(--rule);
+}
+
+/* 数字列：靠右，一个数不拆成几行（1 000 000 中间的空格不是断行的地方） */
+main .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* —— 图 —— */
+main figure {
+  position: relative; /* 放大按钮贴着图的右上角 */
+  margin-inline: 0;
+  text-align: center;
+}
+
+main svg,
+main img,
+main video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 音频的播放条占满这一栏：默认的宽度各个内核不一样 */
+main audio {
+  display: block;
+  width: 100%;
+}
+
+main figcaption {
+  margin-top: var(--s-2);
+  text-wrap: balance; /* 居中的图题折行时两行差不多长，不剩一两个字单独成行 */
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12em), 1fr));
+  gap: var(--s-4);
+  align-items: start; /* 图题长短不一时，图本身仍然顶端对齐 */
+}
+
+.figures > figure {
+  margin-bottom: 0;
+}
+
+/* SVG 工具类：先描边后填充，同时使用时填充生效 */
+svg text {
+  fill: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--svg-md);
+}
+
+svg .t-title {
+  fill: var(--ink);
+  font-size: var(--svg-lg);
+  font-weight: 700;
+}
+
+svg .t-small {
+  fill: var(--muted);
+  font-size: var(--svg-sm);
+}
+
+svg .t-mono {
+  font-family: var(--font-mono);
+}
+
+.s-ink {
+  fill: none;
+  stroke: var(--ink);
+}
+
+.s-text {
+  fill: none;
+  stroke: var(--text);
+}
+
+.s-muted {
+  fill: none;
+  stroke: var(--muted);
+}
+
+.s-line {
+  fill: none;
+  stroke: var(--rule-strong);
+}
+
+.s-accent {
+  fill: none;
+  stroke: var(--accent);
+}
+
+.s-accent-soft {
+  fill: none;
+  stroke: var(--accent-wash);
+}
+
+.s-mark {
+  fill: none;
+  stroke: var(--mark);
+}
+
+.s-mark-soft {
+  fill: none;
+  stroke: var(--mark-wash);
+}
+
+.s-card {
+  fill: none;
+  stroke: var(--raise);
+}
+
+.s-soft {
+  fill: none;
+  stroke: var(--wash);
+}
+
+.f-ink {
+  fill: var(--ink);
+}
+
+.f-text {
+  fill: var(--text);
+}
+
+.f-muted {
+  fill: var(--muted);
+}
+
+.f-line {
+  fill: var(--rule-strong);
+}
+
+.f-accent {
+  fill: var(--accent);
+}
+
+.f-accent-soft {
+  fill: var(--accent-wash);
+}
+
+.f-mark {
+  fill: var(--mark);
+}
+
+.f-mark-soft {
+  fill: var(--mark-wash);
+}
+
+.f-card {
+  fill: var(--raise);
+}
+
+.f-soft {
+  fill: var(--wash);
+}
+
+.w1 {
+  stroke-width: 1;
+}
+
+.w2 {
+  stroke-width: 2;
+}
+
+.dash {
+  stroke-dasharray: 5 5;
+}
+
+/* —— 代码 —— */
+main pre {
+  padding: var(--s-4);
+  overflow-x: auto;
+  border-radius: var(--r-2);
+  background: var(--wash);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs); /* 手机上小一号：一行多放四五个字符，少一些横向滚动 */
+  line-height: 1.65;
+  tab-size: 4;
+}
+
+@media (min-width: 700px) {
+  main pre {
+    font-size: var(--t-sm);
+  }
+}
+
+/* 浏览器给 <code> 的默认字体是 monospace，会盖掉 <pre> 上设的字体：让它跟着 <pre> 走 */
+main pre code {
+  font: inherit;
+}
+
+/* —— 公式：排版之前是 LaTeX 源码 —— */
+.math:not(.zx-math) {
+  font-family: var(--font-mono);
+  font-size: var(--em-sm);
+}
+
+div.math {
+  margin-block: 0 var(--flow);
+  overflow: auto hidden;
+  text-align: center;
+}

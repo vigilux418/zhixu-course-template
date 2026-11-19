@@ -1,0 +1,388 @@
+/* 知序 · 首页：一本摊开的书。左页是封面，右页是目录。 */
+
+.zx-home {
+  max-width: 1180px;
+  margin-inline: auto;
+  padding: 0 var(--s-5) var(--s-8);
+  font-family: var(--font-read);
+  font-weight: var(--w-body);
+}
+
+.zx-spread {
+  display: grid;
+  gap: var(--s-7);
+  padding-block: var(--s-7);
+}
+
+/* —— 封面 —— */
+.zx-cover {
+  position: relative;
+}
+
+.zx-cover > h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--t-display);
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.zx-cover-sub {
+  margin: var(--s-4) 0 0;
+  color: var(--text);
+  font-size: var(--t-lg);
+  line-height: 1.6;
+}
+
+.zx-cover-desc {
+  max-width: 30em;
+  margin: var(--s-4) 0 0;
+  color: var(--muted);
+  font-size: var(--t-md);
+  line-height: 1.8;
+}
+
+/* 阶梯：每讲一级，可以点。读完的台阶是朱砂色；接下来要读的那一级，编号立在一个圆点里。
+ * 每一级是一栏，整栏都能点：编号在上，下面是一个只画上边（踏面）和左边（踢面）的小方块，方块垫高 n 级。
+ * 讲次的名字平时不显示；鼠标移到哪一级，它就出现在阶梯下面“共几讲”那一行的位置上。 */
+.zx-stairs {
+  position: relative;
+  display: grid;
+  gap: var(--s-4);
+  width: 100%;
+  margin-top: var(--s-6);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-xs);
+  line-height: var(--lh-snug);
+}
+
+.zx-flight {
+  display: flex;
+  align-items: flex-end;
+}
+
+.zx-flight > a {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  max-width: 96px;
+  color: var(--muted);
+  text-align: center;
+  text-decoration: none;
+}
+
+/* 一个单元的最后一级：长一点的平台 */
+.zx-flight > .is-landing {
+  flex-grow: 1.6;
+  max-width: 154px;
+}
+
+/* 踏面和踢面。踢面的下端多画一个线宽，压住前一级踏面的端头：拐角上没有缺口 */
+.zx-flight > a::after {
+  content: '';
+  height: calc(var(--rise) + var(--bar));
+  margin-bottom: calc(var(--rise) * var(--n) - var(--bar));
+  border: solid var(--rule-strong);
+  border-width: var(--bar) 0 0 var(--bar);
+}
+
+.zx-flight > .is-done {
+  color: var(--seal);
+}
+
+.zx-flight > .is-done::after {
+  border-color: var(--seal);
+}
+
+.zx-flight > a:hover {
+  color: var(--ink);
+}
+
+.zx-flight > a:hover::after {
+  border-color: var(--ink);
+}
+
+.zx-flight b {
+  margin-bottom: var(--s-1);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.zx-flight > .is-next > b {
+  align-self: center;
+  min-width: 1lh;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  print-color-adjust: exact;
+}
+
+.zx-flight span {
+  position: absolute;
+  inset: calc(100% + var(--s-3)) 0 auto;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: var(--ui-md);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  visibility: hidden;
+}
+
+.zx-flight > a:hover > span {
+  visibility: visible;
+}
+
+.zx-stairs:has(a:hover) + .zx-cover-stat {
+  visibility: hidden;
+}
+
+.zx-cover-stat {
+  margin: var(--s-3) 0 0;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-md);
+  line-height: var(--lh-snug);
+}
+
+/* “继续阅读”和讲次的名字是两截：手机上一行放不下时从中间断开，不把最后一两个字甩到下一行 */
+.zx-cover-go {
+  flex-wrap: wrap;
+  gap: 0 var(--s-4);
+  margin-top: var(--s-5);
+  padding: var(--s-3) var(--s-5);
+  font-size: var(--ui-lg);
+}
+
+/* 封面上的错题入口：一行安静的链接，排在主按钮下面，只有它的文字那么宽 */
+.zx-cover-review {
+  display: block;
+  width: fit-content;
+  margin-top: var(--s-3);
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-md);
+  text-underline-offset: 0.22em;
+}
+
+.zx-cover-author {
+  margin: var(--s-6) 0 0;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+}
+
+.zx-cover-seal {
+  width: 104px;
+  height: 104px;
+  margin-top: var(--s-5);
+}
+
+/* —— 目录 —— */
+.zx-part + .zx-part {
+  margin-top: var(--s-8);
+}
+
+.zx-part > h2 {
+  margin: 0 0 var(--s-5);
+  color: var(--ink);
+  font-size: var(--t-lg);
+  font-weight: 700;
+  letter-spacing: 0.5em;
+}
+
+.zx-unit + .zx-unit {
+  margin-top: var(--s-6);
+}
+
+.zx-unit > h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--t-md);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.zx-unit > p {
+  margin: var(--s-1) 0 0;
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.6;
+}
+
+.zx-unit > ol {
+  margin: var(--s-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zx-row {
+  display: grid;
+  grid-template-areas:
+    'n t dots m'
+    '. d d d';
+  grid-template-columns: 2.1em auto minmax(var(--s-5), 1fr) auto;
+  align-items: baseline;
+  margin-inline: calc(-1 * var(--s-3));
+  padding: var(--s-3);
+  border-radius: var(--r-1);
+  color: var(--text);
+  text-decoration: none;
+  transition: background-color var(--dur-1);
+}
+
+.zx-row:hover {
+  background: var(--wash);
+}
+
+.zx-row::after {
+  content: '';
+  grid-area: dots;
+  margin-inline: var(--s-3);
+  border-bottom: 1px dotted var(--rule-strong);
+  translate: 0 -0.3em;
+}
+
+.zx-row-n {
+  grid-area: n;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.zx-row-t {
+  grid-area: t;
+  color: var(--ink);
+  font-size: var(--t-md);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.zx-row.is-next > .zx-row-t {
+  color: var(--accent);
+}
+
+.zx-row-m {
+  grid-area: m;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+  white-space: nowrap;
+}
+
+/* 摘要最多两行：手机上一行只放得下十几个字，一句话要两行才说得完；更长的在第二行末尾收成省略号 */
+.zx-row-d {
+  display: -webkit-box;
+  grid-area: d;
+  margin-top: var(--s-1);
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.6;
+  text-wrap: pretty;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* —— 错题回顾 —— */
+.zx-review {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zx-review a {
+  display: block;
+  padding: var(--s-3) 0;
+  border-top: 1px solid var(--rule);
+  color: var(--ink);
+  line-height: 1.6;
+  text-decoration: none;
+}
+
+.zx-review a:hover {
+  color: var(--accent);
+}
+
+.zx-review a > span {
+  display: block;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+}
+
+/* —— 术语表 —— */
+.zx-glossary {
+  margin: 0;
+  column-gap: var(--s-6);
+  columns: 2 14em;
+}
+
+.zx-glossary > div {
+  padding: var(--s-2) 0;
+  border-top: 1px solid var(--rule);
+  break-inside: avoid;
+}
+
+.zx-glossary dt {
+  font-weight: 700;
+}
+
+.zx-glossary dt > a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.zx-glossary dt > a:hover {
+  color: var(--accent);
+}
+
+.zx-glossary dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.65;
+}
+
+.zx-colophon {
+  margin: var(--s-8) 0 0;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+}
+
+@media (min-width: 1000px) {
+  .zx-spread {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 0;
+    padding-block: 0;
+  }
+
+  .zx-cover {
+    position: sticky;
+    top: var(--header-h);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: start;
+    justify-content: center;
+    min-height: calc(100dvh - var(--header-h));
+    padding: var(--s-7) var(--s-7) var(--s-7) 0;
+  }
+
+  .zx-contents {
+    padding: var(--s-8) 0 var(--s-7) var(--s-7);
+    border-left: 1px solid var(--rule);
+  }
+}

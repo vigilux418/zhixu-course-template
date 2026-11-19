@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>极限</title>
+<meta name="description" content="自变量无限接近某个值时，函数值靠近谁：极限的直观、严格定义与运算法则。">
+<link rel="stylesheet" href="template/zhixu.css">
+<script src="template/zhixu.js"></script>
+</head>
+<body>
+<main>
+<h1>无限接近，却不必到达</h1>
+<p class="lead">导数与积分都建立在同一个想法上：当自变量无限接近某个值时，函数值会靠近谁。这一讲先用数值和图像建立直觉，再把它写成严格的定义。</p>
+<ul class="goals">
+  <li>用数值与图像判断极限</li>
+  <li>读懂极限的 ε–δ 定义</li>
+  <li>用运算法则和重要极限求值</li>
+</ul>
+
+<section id="limit-idea">
+<h2>一个算不出来的点</h2>
+<p>函数 <span class="math">f(x) = \dfrac{x^2 - 1}{x - 1}</span> 在 <span class="math">x = 1</span> 处没有定义，因为分母为零。可是只要 <span class="math">x \ne 1</span>，它就等于 <span class="math">x + 1</span>。让 <span class="math">x</span> 从两侧靠近 1，函数值列在<a href="#tbl-approach"></a>里，图像见<a href="#fig-hole"></a>。</p>
+<table id="tbl-approach">
+  <caption><span class="math">x</span> 靠近 1 时 <span class="math">f(x)</span> 的取值</caption>
+  <thead>
+    <tr><th class="num"><span class="math">x</span></th><th class="num"><span class="math">f(x)</span></th><th class="num"><span class="math">|f(x) - 2|</span></th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="num">0.9</td><td class="num">1.9</td><td class="num">0.1</td></tr>
+    <tr><td class="num">0.99</td><td class="num">1.99</td><td class="num">0.01</td></tr>
+    <tr><td class="num">0.999</td><td class="num">1.999</td><td class="num">0.001</td></tr>
+    <tr><td class="num">1.001</td><td class="num">2.001</td><td class="num">0.001</td></tr>
+    <tr><td class="num">1.01</td><td class="num">2.01</td><td class="num">0.01</td></tr>
+  </tbody>
+</table>
+<figure id="fig-hole">
+  <svg viewBox="0 0 320 220" role="img" aria-label="直线 y = x + 1 的图像，在点 (1, 2) 处是一个空心圆点">
+    <line class="s-muted" x1="20" y1="180" x2="300" y2="180"/>
+    <line class="s-muted" x1="100" y1="212" x2="100" y2="10"/>
+    <path class="f-muted" d="M300 180 L292 176 L292 184 Z M100 10 L96 18 L104 18 Z"/>
+    <line class="s-line dash" x1="150" y1="100" x2="150" y2="180"/>
+    <line class="s-line dash" x1="100" y1="100" x2="150" y2="100"/>
+    <line class="s-accent w2" x1="30" y1="196" x2="250" y2="20"/>
+    <circle class="f-card s-accent w2" cx="150" cy="100" r="5"/>
+    <text class="t-small" x="150" y="197" text-anchor="middle">1</text>
+    <text class="t-small" x="92" y="104" text-anchor="end">2</text>
+    <text class="t-small" x="296" y="198" text-anchor="end">x</text>
+    <text class="t-small" x="110" y="20">y</text>
+    <text class="t-small" x="162" y="118">(1, 2)</text>
+  </svg>
+  <figcaption><span class="math">y = f(x)</span> 的图像是一条直线，只在 <span class="math">(1, 2)</span> 处缺了一个点。</figcaption>
+</figure>
+<p>函数值与 2 的距离可以任意小，尽管永远取不到 2。我们把这件事记作</p>
+<div class="math" id="eq-first-limit">\lim_{x \to 1} \frac{x^2 - 1}{x - 1} = 2</div>
+<p>读作“当 <span class="math">x</span> 趋于 1 时，<span class="math">f(x)</span> 的<dfn data-def="自变量无限接近某个值时，函数值无限接近的那个确定的数。">极限</dfn>是 2”。极限只关心靠近的过程，不关心 <span class="math">x = 1</span> 这一点本身。</p>
+</section>
+
+<section id="limit-definition">
+<h2>把“无限接近”说严格</h2>
+<p>“无限接近”是直觉，还不是定义。严格的说法<span class="note">柯西给出了雏形，魏尔斯特拉斯在 19 世纪 60 年代把它写成今天的样子。</span>是：如果对任意给定的 <span class="math">\varepsilon \gt 0</span>，总能找到 <span class="math">\delta \gt 0</span>，使得</p>
+<div class="math" id="eq-epsilon-delta">0 \lt |x - a| \lt \delta \implies |f(x) - L| \lt \varepsilon</div>
+<p>就说 <span class="math">\lim_{x \to a} f(x) = L</span>。对上面的例子，<span class="math">|f(x) - 2| = |x - 1|</span>，取 <span class="math">\delta = \varepsilon</span> 就满足<a href="#eq-epsilon-delta"></a>，这正是<a href="#tbl-approach"></a>第三列的规律。</p>
+<p>极限也可能不存在。看分段函数</p>
+<div class="math" id="eq-piecewise">
+  g(x) =
+  \begin{cases}
+  x + 1, &amp; x \lt 0 \\
+  x^2, &amp; x \ge 0
+  \end{cases}
+</div>
+<p>它在 <span class="math">x = 0</span> 两侧走向不同的值。只从一侧靠近时的极限叫<dfn data-def="自变量只从左侧或只从右侧靠近时的极限，分别叫左极限与右极限。">单侧极限</dfn>：左极限 <span class="math">\lim_{x \to 0^-} g(x) = 1</span>，右极限 <span class="math">\lim_{x \to 0^+} g(x) = 0</span>。两者不相等，所以 <span class="math">\lim_{x \to 0} g(x)</span> 不存在。</p>
+<p>反过来，如果极限存在，而且恰好等于函数值，即 <span class="math">\lim_{x \to a} f(x) = f(a)</span>，就说 <span class="math">f</span> 在 <span class="math">a</span> 处<dfn data-def="函数在一点的极限存在，并且等于该点的函数值；图像在这一点没有断开。">连续</dfn>。多项式、正弦函数、指数函数在定义域内处处连续，求它们的极限时直接代入即可。</p>
+</section>
+
+<section id="limit-rules">
+<h2>运算法则与重要极限</h2>
+<p>设在同一个趋近过程中 <span class="math">\lim f(x) = A</span>，<span class="math">\lim g(x) = B</span>，则</p>
+<div class="math">
+  \begin{aligned}
+  \lim\,[f(x) \pm g(x)] &amp;= A \pm B, \\
+  \lim\,[f(x)\,g(x)] &amp;= AB, \\
+  \lim \frac{f(x)}{g(x)} &amp;= \frac{A}{B} \quad (B \ne 0).
+  \end{aligned}
+</div>
+<p>另有两个极限要记住，后两讲会反复用到<span class="note">第二个极限给出了自然常数 <span class="math">e</span>，这个记号出自欧拉。</span>：</p>
+<div class="math" id="eq-sinc">\lim_{x \to 0} \frac{\sin x}{x} = 1</div>
+<div class="math" id="eq-e">\lim_{n \to \infty} \left(1 + \frac{1}{n}\right)^{n} = e \approx 2.718</div>
+<div class="example" id="ex-factor">
+  <p>求 <span class="math">\displaystyle \lim_{x \to 2} \frac{x^2 - 4}{x - 2}</span>。</p>
+  <details class="answer">
+    <summary>解答</summary>
+    <p>直接代入得到 <span class="math">\frac{0}{0}</span>，没有意义。先因式分解，再约去公因式：</p>
+    <div class="math">
+      \begin{aligned}
+      \lim_{x \to 2} \frac{x^2 - 4}{x - 2}
+      &amp;= \lim_{x \to 2} \frac{(x - 2)(x + 2)}{x - 2} \\
+      &amp;= \lim_{x \to 2}\,(x + 2) = 4.
+      \end{aligned}
+    </div>
+  </details>
+</div>
+<div class="callout pitfall">
+  <p><span class="math">\frac{0}{0}</span> 既不等于 0，也不等于 1，它只说明需要先变形。约分的前提是 <span class="math">x \ne 2</span>，而极限恰好不看 <span class="math">x = 2</span> 这一点。</p>
+</div>
+</section>
+
+<section id="limit-check">
+<h2>练一练</h2>
+<div class="quiz" data-answer="6">
+  <p>求 <span class="math">\displaystyle \lim_{x \to 3} \frac{x^2 - 9}{x - 3}</span> 的值。</p>
+  <p class="hint">分子可以分解成 <span class="math">(x - 3)(x + 3)</span>。</p>
+  <div class="explain"><p>约去 <span class="math">x - 3</span>，得 <span class="math">\lim_{x \to 3}\,(x + 3) = 6</span>。</p></div>
+</div>
+<div class="quiz" data-answer="3">
+  <p>利用<a href="#eq-sinc"></a>，求 <span class="math">\displaystyle \lim_{x \to 0} \frac{\sin 3x}{x}</span> 的值。</p>
+  <div class="explain"><p><span class="math">\dfrac{\sin 3x}{x} = 3 \cdot \dfrac{\sin 3x}{3x}</span>，后一个因子趋于 1，所以极限是 3。</p></div>
+</div>
+<div class="quiz" data-answer="b">
+  <p>对<a href="#eq-piecewise"></a>里的 <span class="math">g(x)</span>，下面哪个说法正确？</p>
+  <ol>
+    <li><span class="math">\lim_{x \to 0} g(x) = 0</span></li>
+    <li><span class="math">\lim_{x \to 0} g(x)</span> 不存在</li>
+    <li><span class="math">\lim_{x \to 0} g(x) = 1</span></li>
+  </ol>
+  <div class="explain"><p>左极限是 1，右极限是 0，两者不相等，极限不存在。</p></div>
+</div>
+</section>
+
+<section class="recap">
+<h2>本讲小结</h2>
+<ul>
+  <li>极限描述趋近的过程，与函数在该点有没有定义无关。</li>
+  <li><span class="math">\varepsilon</span>–<span class="math">\delta</span> 定义把“无限接近”变成可以验证的不等式。</li>
+  <li>左、右极限都存在且相等，极限才存在。</li>
+</ul>
+<p>有了极限，就能谈“一瞬间”的变化率，见<a href="02-derivatives.html"></a>。</p>
+</section>
+</main>
+</body>
+</html>

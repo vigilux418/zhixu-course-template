@@ -1,0 +1,282 @@
+/* 知序 · 打印与减弱动效
+ * 只有这个文件允许使用 !important：打印必须压过屏幕上的任何状态。 */
+
+/* 页眉印课程名和这一讲的名字，页脚印页码。它们写在页边框里：眼下只有 Chromium 认得，别的内核照旧不印。
+ * 文字由 main.js 放在根元素的两个变量里；颜色和字体写在 @page 上，页边框会继承。第一页有讲头，不再印页眉 */
+@page {
+  margin: 18mm 16mm 20mm;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-xs);
+
+  @top-left {
+    content: var(--print-course);
+  }
+
+  @top-right {
+    content: var(--print-lesson);
+  }
+
+  @bottom-center {
+    content: counter(page) ' / ' counter(pages);
+  }
+}
+
+@page :first {
+  @top-left {
+    content: none;
+  }
+
+  @top-right {
+    content: none;
+  }
+}
+
+@media print {
+  html {
+    --read: 14.5px !important;
+    background: none !important; /* 纸本身就是白的，不要再铺一层底色 */
+  }
+
+  /* 屏幕上 body 的内边距都是为屏幕留的：上面让出页眉；模态浮层开着时右边垫回滚动条的宽度（overlays.css）。
+     打印稿两样都不要：搜索、设置或笔记开着的时候打印，版面和平时一样 */
+  html.zx-js body {
+    display: block !important;
+    padding: 0 !important;
+  }
+
+  .zx-header,
+  .zx-progress,
+  .zx-side,
+  .zx-skip,
+  .zx-foot,
+  .zx-resume,
+  .zx-copy,
+  .zx-zoom-btn,
+  .zx-anchor,
+  main audio,
+  main video,
+  .zx-quiz-bar,
+  .zx-stepper-bar,
+  .zx-tablist,
+  .zx-ref,
+  .zx-cover-go,
+  .zx-dialog,
+  .zx-pop,
+  .quiz > .hint,
+  .quiz > .explain {
+    display: none !important;
+  }
+
+  /* 填空题：答题栏不进打印稿，留一条横线给读者写答案 */
+  .quiz[data-kind='fill']::after {
+    content: '';
+    display: block;
+    width: 14em;
+    height: 2.2em;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  html.zx-js main {
+    display: block !important;
+    padding: 0 !important;
+  }
+
+  main a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  main a[href^='http://']::after,
+  main a[href^='https://']::after {
+    content: '（' attr(href) '）';
+    color: var(--muted);
+    font-size: var(--em-sm);
+    overflow-wrap: anywhere;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  summary {
+    break-after: avoid;
+  }
+
+  figure,
+  table,
+  blockquote,
+  .callout,
+  .example,
+  .quiz,
+  .recap,
+  .cards > div,
+  .steps > li,
+  .timeline > li {
+    break-inside: avoid;
+  }
+
+  h2[data-num]::before {
+    position: static !important;
+    margin-right: 0.6em !important;
+  }
+
+  /* 讲次的大数字要有页边才挂得住：印出来还是“第 4 讲”那几个字 */
+  h1[data-num]::before {
+    display: none !important;
+  }
+
+  .zx-kicker-n {
+    display: inline !important;
+  }
+
+  /* 浏览器默认不印底色：屏幕上靠淡底色分出来的块，印出来改用细线框 */
+  main pre,
+  .recap,
+  .cards > div,
+  .flow > li {
+    border: 1px solid var(--rule-strong);
+    background: none !important;
+  }
+
+  main pre {
+    overflow: visible !important;
+    white-space: pre-wrap;
+  }
+
+  .zx-lines {
+    min-width: 0 !important;
+  }
+
+  .zx-table,
+  div.zx-math {
+    overflow: visible !important;
+  }
+
+  /* 旁注回到行内括注：浮层和页边的样子都撤掉 */
+  .zx-note {
+    position: static !important;
+    display: inline !important;
+    float: none !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    color: var(--muted) !important;
+    font-size: var(--t-xs) !important;
+  }
+
+  /* 纸上没有页边：伸进页边的宽内容收回来 */
+  .zx-wide {
+    margin-right: 0 !important;
+  }
+
+  .zx-note::before {
+    content: '（注：' !important;
+    margin: 0 !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-weight: 400 !important;
+  }
+
+  .zx-note::after {
+    content: '）';
+  }
+
+  /* 演示的每一帧、选项卡的每一页都摊开 */
+  .stepper[data-step] {
+    display: block !important;
+  }
+
+  .stepper[data-step] > figure {
+    margin-bottom: var(--s-3) !important;
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--rule);
+    visibility: visible !important;
+  }
+
+  .stepper figcaption {
+    min-height: 0 !important;
+  }
+
+  .stepper::before {
+    break-after: avoid;
+  }
+
+  .zx-tabs > [data-tab] {
+    display: block !important;
+    margin-bottom: var(--s-3);
+  }
+
+  .zx-tabs > [data-tab]::before {
+    content: attr(data-tab);
+    display: block;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--ui-md);
+    font-weight: 700;
+  }
+
+  /* 小测只留题面，答案集中附在讲末 */
+  .zx-opt {
+    padding: 0.1em 0 !important;
+    background: none !important;
+  }
+
+  .zx-opt::after,
+  .zx-fill {
+    display: none !important;
+  }
+
+  .zx-answers {
+    display: block !important;
+    break-before: page;
+  }
+
+  .zx-box {
+    print-color-adjust: exact;
+  }
+
+  /* 浏览器默认不印底色。靠底色表达的东西换一种画法：焦点格改成粗框深字，标亮改成下划线 */
+  .cells > .hit {
+    border-width: 2px !important;
+    background: none !important;
+    color: var(--ink) !important;
+  }
+
+  main mark {
+    background: none !important;
+    text-decoration: underline 2px var(--mark-ink) !important;
+    text-underline-offset: 0.2em !important;
+  }
+
+  /* 首页：封面在上，目录在下 */
+  .zx-spread {
+    display: block !important;
+  }
+
+  .zx-cover {
+    position: static !important;
+    min-height: 0 !important;
+    padding: 0 0 var(--s-6) !important;
+  }
+
+  .zx-contents {
+    padding: 0 !important;
+    border: 0 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  *::backdrop {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+}

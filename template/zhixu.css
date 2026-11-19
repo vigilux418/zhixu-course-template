@@ -1,0 +1,3943 @@
+/* 知序样式（由 engine/build.js 生成，请勿直接修改；源码在 engine/src/css） */
+
+/* 知序 · 设计令牌
+ * 颜色、字号、间距、圆角只在这里定义；其余样式文件只引用变量。 */
+
+@font-face {
+  font-family: 'Zhixu Serif';
+  src: url('fonts/serif.woff') format('woff');
+  font-weight: 400 700;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Zhixu Kai';
+  src: url('fonts/wenkai.woff') format('woff');
+  font-weight: 400;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Zhixu Mono';
+  src: url('fonts/jbm.woff') format('woff');
+  font-weight: 100 800;
+  font-display: block;
+}
+
+:root {
+  /* 字体：正文宋体，界面系统黑体，引文楷体，代码等宽 */
+  --font-serif: 'Zhixu Serif', 'Songti SC', 'Noto Serif CJK SC', 'Source Han Serif SC', 'STSong', 'SimSun', serif;
+  --font-sans:
+    system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans CJK SC',
+    sans-serif;
+  --font-kai: 'Zhixu Kai', 'Kaiti SC', 'STKaiti', 'KaiTi', var(--font-serif);
+  /* 代码里的汉字交给黑体；排在 monospace 前面，免得落到系统默认的等宽宋体 */
+  --font-mono:
+    'Zhixu Mono', ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, Menlo, 'PingFang SC', 'Microsoft YaHei UI',
+    'Microsoft YaHei', 'Noto Sans CJK SC', monospace;
+  --font-read: var(--font-serif);
+
+  /* 字号：正文一级由读者调节，其余按比例跟随；界面字号固定 */
+  --read: 17px;
+  --t-xs: max(12px, calc(var(--read) * 0.78));
+  --t-sm: calc(var(--read) * 0.88);
+  --t-md: var(--read);
+  --t-lg: calc(var(--read) * 1.2);
+  /* 两级大标题在手机上跟着屏幕宽度缩小一些（屏幕宽过 430 像素左右就是原来的大小）：
+   * 一行能多放两三个字，十来个字的标题不必折成两行 */
+  --t-xl: clamp(calc(var(--read) * 1.3), 6.4vw, calc(var(--read) * 1.5));
+  --t-2xl: clamp(calc(var(--read) * 1.65), 8.4vw, calc(var(--read) * 2.1));
+  --t-display: clamp(34px, 4.6vw, 54px);
+  --t-numeral: calc(var(--read) * 3.2); /* 章首页的讲次：两位数也要放得进左边的页边 */
+  --ui-xs: 12px;
+  --ui-sm: 13px;
+  --ui-md: 14px;
+  --ui-lg: 16px;
+  --em-xs: 0.75em;
+  --em-sm: 0.88em;
+  --em-math: 1.1em;
+  --svg-sm: 12px;
+  --svg-md: 14px;
+  --svg-lg: 16px;
+  --svg-seal: 34px;
+
+  --lh-body: 1.85;
+  --lh-snug: 1.6;
+  --lh-tight: 1.3;
+
+  /* 间距 */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 72px;
+
+  /* 圆角只有三档：小件 2，控件 4，容器 8。再大的圆角是应用界面的语言，不是书的 */
+  --r-0: 2px;
+  --r-1: 4px;
+  --r-2: 8px;
+  --r-inner: 7px; /* 容器圆角减去 1px 边框：贴着边框内侧的色块用 */
+  --r-pill: 999px; /* 只给圆形的记号用：序号圈、单选的圆点 */
+
+  /* 两个尺寸：别处要给它们让位时，从这里算，不另写一个数 */
+  --tool: 36px; /* 图标按钮的边长 */
+  --bar: 2px; /* 标出当前小节、标亮代码行的竖条 */
+
+  /* 正文的字重：见本文件末尾，普通屏幕上的浅底主题会加重一点 */
+  --w-body: 400;
+
+  /* 版面 */
+  --header-h: 52px;
+  --side-w: 272px;
+  --measure: calc(var(--read) * 39);
+  --note-w: 208px;
+  --note-gap: 32px;
+  --gutter: calc(var(--read) * 5); /* 宽屏左边的页边：挂得下 26.10 这样的小节编号和两位数的讲次，所以跟着字号走 */
+
+  /* 动效 */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-1: 120ms;
+  --dur-2: 220ms;
+  --dur-3: 420ms;
+
+  /* 提示卡：沿用 Material 配色 */
+  --c-note: #448aff;
+  --c-insight: #00bfa5;
+  --c-memory: #00b0ff;
+  --c-question: #64dd17;
+  --c-pitfall: #ff9100;
+  --c-danger: #ff1744;
+  --c-exam: #7c4dff;
+
+  /* 蒙版图标 */
+  --icon-note: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%202C6.47%202%202%206.47%202%2012s4.47%2010%2010%2010%2010-4.47%2010-10S17.53%202%2012%202m3.1%205.07c.14%200%20.28.05.4.16l1.27%201.27c.23.22.23.57%200%20.78l-1%201-2.05-2.05%201-1c.1-.11.24-.16.38-.16m-1.97%201.74%202.06%202.06-6.06%206.06H7.07v-2.06z%22%2F%3E%3C%2Fsvg%3E');
+  --icon-insight: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M17.66%2011.2c-.23-.3-.51-.56-.77-.82-.67-.6-1.43-1.03-2.07-1.66C13.33%207.26%2013%204.85%2013.95%203c-.95.23-1.78.75-2.49%201.32-2.59%202.08-3.61%205.75-2.39%208.9.04.1.08.2.08.33%200%20.22-.15.42-.35.5-.23.1-.47.04-.66-.12a.6.6%200%200%201-.14-.17c-1.13-1.43-1.31-3.48-.55-5.12C5.78%2010%204.87%2012.3%205%2014.47c.06.5.12%201%20.29%201.5.14.6.41%201.2.71%201.73%201.08%201.73%202.95%202.97%204.96%203.22%202.14.27%204.43-.12%206.07-1.6%201.83-1.66%202.47-4.32%201.53-6.6l-.13-.26c-.21-.46-.77-1.26-.77-1.26m-3.16%206.3c-.28.24-.74.5-1.1.6-1.12.4-2.24-.16-2.9-.82%201.19-.28%201.9-1.16%202.11-2.05.17-.8-.15-1.46-.28-2.23-.12-.74-.1-1.37.17-2.06.19.38.39.76.63%201.06.77%201%201.98%201.44%202.24%202.8.04.14.06.28.06.43.03.82-.33%201.72-.93%202.27%22%2F%3E%3C%2Fsvg%3E');
+  --icon-memory: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M17%209H7V7h10m0%206H7v-2h10m-3%206H7v-2h7M12%203a1%201%200%200%201%201%201%201%201%200%200%201-1%201%201%201%200%200%201-1-1%201%201%200%200%201%201-1m7%200h-4.18C14.4%201.84%2013.3%201%2012%201s-2.4.84-2.82%202H5a2%202%200%200%200-2%202v14a2%202%200%200%200%202%202h14a2%202%200%200%200%202-2V5a2%202%200%200%200-2-2%22%2F%3E%3C%2Fsvg%3E');
+  --icon-question: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22m15.07%2011.25-.9.92C13.45%2012.89%2013%2013.5%2013%2015h-2v-.5c0-1.11.45-2.11%201.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41a2%202%200%200%200-2-2%202%202%200%200%200-2%202H8a4%204%200%200%201%204-4%204%204%200%200%201%204%204%203.2%203.2%200%200%201-.93%202.25M13%2019h-2v-2h2M12%202A10%2010%200%200%200%202%2012a10%2010%200%200%200%2010%2010%2010%2010%200%200%200%2010-10c0-5.53-4.5-10-10-10%22%2F%3E%3C%2Fsvg%3E');
+  --icon-pitfall: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M13%2014h-2V9h2m0%209h-2v-2h2M1%2021h22L12%202z%22%2F%3E%3C%2Fsvg%3E');
+  --icon-danger: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22m11.5%2020%204.86-9.73H13V4l-5%209.73h3.5zM12%202c2.75%200%205.1%201%207.05%202.95S22%209.25%2022%2012s-1%205.1-2.95%207.05S14.75%2022%2012%2022s-5.1-1-7.05-2.95S2%2014.75%202%2012s1-5.1%202.95-7.05S9.25%202%2012%202%22%2F%3E%3C%2Fsvg%3E');
+  --icon-exam: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M7%202v2h1v14a4%204%200%200%200%204%204%204%204%200%200%200%204-4V4h1V2zm4%2014c-.6%200-1-.4-1-1s.4-1%201-1%201%20.4%201%201-.4%201-1%201m2-4c-.6%200-1-.4-1-1s.4-1%201-1%201%20.4%201%201-.4%201-1%201m1-5h-4V4h4z%22%2F%3E%3C%2Fsvg%3E');
+  --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+  --icon-cross: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6.5 6.5l11 11M17.5 6.5l-11 11'/%3E%3C/svg%3E");
+  --icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5.5l6.5 6.5L9 18.5'/%3E%3C/svg%3E");
+}
+
+/* —— 浅色（默认） —— */
+:root,
+html[data-theme='light'] {
+  color-scheme: light;
+  --paper: #fcfcfa;
+  --wash: #f3f4f3;
+  --raise: #ffffff;
+  --rule: #e2e4e3;
+  --rule-strong: #c5c9c9;
+  --ink: #14181f;
+  --text: #2a2f38;
+  --muted: #5f6875;
+  --accent: #2757c6;
+  --accent-strong: #1b3f96;
+  --accent-wash: #eaf0fc;
+  --on-accent: #ffffff;
+  --mark: #9a5b0a;
+  --mark-wash: #fbf1dc;
+  --mark-ink: #fbe7a8;
+  --lit: #fbe7a8; /* 讲解点到的那一行代码的底色：七种着色在它上面都要看得清 */
+  --good: #1c7449;
+  --good-wash: #e6f4ec;
+  --bad: #b93225;
+  --bad-wash: #fbebe8;
+  --seal: #c4372b;
+  --shade: rgb(20 24 31 / 0.16);
+  --veil: rgb(20 24 31 / 0.38);
+  --callout-tint: 10%; /* 提示卡标题条的底色里，类型色占多少 */
+
+  --code-comment: #5a6472;
+  --code-keyword: #a3256e;
+  --code-string: #1b6943;
+  --code-number: #93560a;
+  --code-title: #2452be;
+  --code-type: #6644bd;
+  --code-attr: #0c6a73;
+}
+
+/* —— 纸张 —— */
+html[data-theme='sepia'] {
+  color-scheme: light;
+  --paper: #f6f0e3;
+  --wash: #ece4d2;
+  --raise: #fbf7ec;
+  --rule: #ddd3be;
+  --rule-strong: #c2b69c;
+  --ink: #2a2318;
+  --text: #3a3125;
+  --muted: #6a5f4c;
+  --accent: #2a52a8;
+  --accent-strong: #1c3a7c;
+  --accent-wash: #e4e3dc;
+  --on-accent: #ffffff;
+  --mark: #8a5208;
+  --mark-wash: #f1e3c2;
+  --mark-ink: #f3dc9a;
+  --lit: #f3dc9a;
+  --good: #1f6b45;
+  --good-wash: #e1e8d2;
+  --bad: #a82f23;
+  --bad-wash: #f3dfd3;
+  --seal: #bb3327;
+  --shade: rgb(42 35 24 / 0.18);
+  --veil: rgb(42 35 24 / 0.4);
+  --callout-tint: 16%;
+
+  --code-comment: #635845;
+  --code-keyword: #96215f;
+  --code-string: #1b6140;
+  --code-number: #845009;
+  --code-title: #264d9e;
+  --code-type: #5c3fa8;
+  --code-attr: #0e5f67;
+}
+
+/* —— 深色 —— */
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #15181d;
+  --wash: #1d2128;
+  --raise: #21262e;
+  --rule: #2c323b;
+  --rule-strong: #414a57;
+  --ink: #eef1f5;
+  --text: #c9cfd9;
+  --muted: #949eac;
+  --accent: #8ab0fb;
+  --accent-strong: #b1cbfd;
+  --accent-wash: #1c2940;
+  --on-accent: #0f1522;
+  --mark: #e3b15d;
+  --mark-wash: #2e2717;
+  --mark-ink: #5b4a14;
+  --lit: #3e330e;
+  --good: #73cf9d;
+  --good-wash: #17291f;
+  --bad: #f08d80;
+  --bad-wash: #321c19;
+  --seal: #e2604f;
+  --shade: rgb(0 0 0 / 0.5);
+  --veil: rgb(0 0 0 / 0.56);
+  --callout-tint: 18%;
+
+  --code-comment: #949eac;
+  --code-keyword: #f18fc2;
+  --code-string: #8fd7ad;
+  --code-number: #e8b872;
+  --code-title: #92b6ff;
+  --code-type: #bba8ff;
+  --code-attr: #80d4dc;
+}
+
+html[data-font='sans'] {
+  --font-read: var(--font-sans);
+}
+
+/* 普通屏幕（一个 CSS 像素就是一个物理像素）上，常规字重的宋体横笔不到一个像素，读久了发虚。
+ * 浅底的两个主题把正文加重一点；高分屏和深色主题不需要。字体是可变字重的，不多占体积。
+ * 只有内置的宋体有 460 这一档：读者把正文换成黑体时不加重，界面上的黑体各自写明字重，不跟着继承。 */
+@media (max-resolution: 1.49dppx) {
+  html:is([data-theme='light'], [data-theme='sepia']):not([data-font='sans']) {
+    --w-body: 460;
+  }
+}
+
+/* 知序 · 基础排版
+ * 这里只描述作者写下的原始 HTML：即使脚本没有运行，页面也能照常阅读。 */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  text-size-adjust: 100%;
+  scrollbar-gutter: stable; /* 页面有长有短，滚动条时有时无：一直给它留着位置，版面不横移 */
+  scroll-padding-top: calc(var(--header-h) + var(--s-4));
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-md);
+  line-height: var(--lh-snug);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+html [hidden] {
+  display: none;
+}
+
+/* —— 正文容器 —— */
+main {
+  --flow: 1.1em;
+  font-family: var(--font-read);
+  font-size: var(--t-md);
+  font-weight: var(--w-body);
+  line-height: var(--lh-body);
+  overflow-wrap: break-word;
+  line-break: strict;
+  text-autospace: normal;
+}
+
+html:not(.zx-js) main {
+  max-width: calc(var(--measure) + 2 * var(--s-5));
+  margin-inline: auto;
+  padding: var(--s-7) var(--s-5) var(--s-8);
+}
+
+/* 关掉脚本时没有人给宽表格套上滚动的容器：让表格自己横向滚动，不把整页撑宽 */
+html:not(.zx-js) main table {
+  display: block;
+  overflow-x: auto;
+}
+
+/* 所有块级内容共用同一个段距；特异性为零，组件可以直接改写 */
+main
+  :where(
+    p,
+    ul,
+    ol,
+    dl,
+    blockquote,
+    figure,
+    table,
+    pre,
+    details,
+    .callout,
+    .cards,
+    .example,
+    .quiz,
+    .stepper,
+    .tabs,
+    .figures
+  ) {
+  margin-block: 0 var(--flow);
+}
+
+/* —— 标题 —— */
+main h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--t-2xl);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  text-wrap: balance;
+}
+
+main h2 {
+  margin: var(--s-7) 0 var(--s-4);
+  color: var(--ink);
+  font-size: var(--t-xl);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  text-wrap: balance;
+}
+
+main h3 {
+  margin: var(--s-6) 0 var(--s-2);
+  color: var(--ink);
+  font-size: var(--t-lg);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+}
+
+main h4 {
+  margin: var(--s-5) 0 var(--s-1);
+  color: var(--ink);
+  font-size: var(--t-md);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+}
+
+/* —— 段落与行内 —— */
+main > p,
+section > p {
+  text-wrap: pretty;
+}
+
+/* 导语：手机上和正文一样大，免得它一段就占掉半屏；屏幕够宽时大一号 */
+.lead {
+  margin-top: var(--s-4);
+  color: var(--text);
+  line-height: 1.7;
+}
+
+/* 两端对齐只在行够长时用：窄屏上一行没几个字，遇到公式和长单词，字距会被拉得很开 */
+@media (min-width: 700px) {
+  main > p,
+  section > p {
+    text-align: justify;
+  }
+
+  .lead {
+    font-size: var(--t-lg);
+  }
+}
+
+main a {
+  color: var(--accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  transition: text-decoration-color var(--dur-1);
+}
+
+main a:hover {
+  text-decoration-color: currentColor;
+}
+
+main strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* 中文不用斜体：着重改用楷体 */
+main em {
+  font-family: var(--font-kai);
+  font-style: normal;
+}
+
+main mark {
+  padding-inline: 0.1em;
+  background: linear-gradient(transparent 58%, var(--mark-ink) 58%);
+  color: inherit;
+}
+
+main :not(pre) > code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--r-0);
+  background: var(--wash);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--em-sm);
+}
+
+main kbd {
+  padding: 0.1em 0.45em;
+  border: 1px solid var(--rule-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--r-1);
+  background: var(--raise);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--em-sm);
+}
+
+main sub,
+main sup {
+  font-size: var(--em-xs);
+  line-height: 0;
+}
+
+main abbr[title] {
+  text-decoration: underline dotted var(--muted);
+  cursor: help;
+}
+
+main dfn {
+  font-style: normal;
+  text-decoration: underline dotted var(--accent);
+  text-underline-offset: 0.22em;
+}
+
+main dfn[data-def] {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* 旁注在脚本接管之前，以括注的形式留在行内。限定为 span：提示卡也有一种类型叫 note */
+span.note {
+  color: var(--muted);
+  font-size: var(--em-sm);
+}
+
+span.note::before {
+  content: '（';
+}
+
+span.note::after {
+  content: '）';
+}
+
+/* —— 列表 —— */
+main ul,
+main ol {
+  padding-left: 1.6em;
+}
+
+main li {
+  margin-block: 0.3em;
+}
+
+main li::marker {
+  color: var(--muted);
+}
+
+main li > :where(ul, ol) {
+  margin-block: 0.3em 0;
+}
+
+main dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  border-bottom: 1px solid var(--rule);
+}
+
+main dt {
+  padding: 0.5em 1.4em 0.5em 0;
+  border-top: 1px solid var(--rule);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+main dd {
+  margin: 0;
+  padding-block: 0.5em;
+  border-top: 1px solid var(--rule);
+}
+
+/* —— 引文：楷体，两侧缩进 —— */
+main blockquote {
+  margin-inline: 2em;
+  font-family: var(--font-kai);
+}
+
+main blockquote > p {
+  margin-bottom: 0.4em;
+}
+
+main blockquote cite {
+  display: block;
+  color: var(--muted);
+  font-size: var(--t-sm);
+  font-style: normal;
+  text-align: right;
+}
+
+main blockquote cite::before {
+  content: '—— ';
+}
+
+main hr {
+  width: 30%;
+  margin: var(--s-6) auto;
+  border: 0;
+  border-top: 1px solid var(--rule-strong);
+}
+
+/* —— 表格：三线表 —— */
+main table {
+  width: 100%;
+  border-block: 2px solid var(--ink);
+  border-collapse: collapse;
+  font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-snug);
+}
+
+main caption {
+  padding-bottom: var(--s-2);
+  color: var(--muted);
+  font-size: var(--t-sm);
+  text-align: center;
+}
+
+main th,
+main td {
+  padding: 0.55em 0.9em;
+  text-align: left;
+  vertical-align: top;
+}
+
+/* 表头不折行：列再多，也不会把表头挤成一字一行 */
+main th {
+  white-space: nowrap;
+}
+
+main thead th {
+  border-bottom: 1px solid var(--ink);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+main tbody th {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+main tbody tr + tr > * {
+  border-top: 1px solid var(--rule);
+}
+
+/* 数字列：靠右，一个数不拆成几行（1 000 000 中间的空格不是断行的地方） */
+main .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* —— 图 —— */
+main figure {
+  position: relative; /* 放大按钮贴着图的右上角 */
+  margin-inline: 0;
+  text-align: center;
+}
+
+main svg,
+main img,
+main video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 音频的播放条占满这一栏：默认的宽度各个内核不一样 */
+main audio {
+  display: block;
+  width: 100%;
+}
+
+main figcaption {
+  margin-top: var(--s-2);
+  text-wrap: balance; /* 居中的图题折行时两行差不多长，不剩一两个字单独成行 */
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12em), 1fr));
+  gap: var(--s-4);
+  align-items: start; /* 图题长短不一时，图本身仍然顶端对齐 */
+}
+
+.figures > figure {
+  margin-bottom: 0;
+}
+
+/* SVG 工具类：先描边后填充，同时使用时填充生效 */
+svg text {
+  fill: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--svg-md);
+}
+
+svg .t-title {
+  fill: var(--ink);
+  font-size: var(--svg-lg);
+  font-weight: 700;
+}
+
+svg .t-small {
+  fill: var(--muted);
+  font-size: var(--svg-sm);
+}
+
+svg .t-mono {
+  font-family: var(--font-mono);
+}
+
+.s-ink {
+  fill: none;
+  stroke: var(--ink);
+}
+
+.s-text {
+  fill: none;
+  stroke: var(--text);
+}
+
+.s-muted {
+  fill: none;
+  stroke: var(--muted);
+}
+
+.s-line {
+  fill: none;
+  stroke: var(--rule-strong);
+}
+
+.s-accent {
+  fill: none;
+  stroke: var(--accent);
+}
+
+.s-accent-soft {
+  fill: none;
+  stroke: var(--accent-wash);
+}
+
+.s-mark {
+  fill: none;
+  stroke: var(--mark);
+}
+
+.s-mark-soft {
+  fill: none;
+  stroke: var(--mark-wash);
+}
+
+.s-card {
+  fill: none;
+  stroke: var(--raise);
+}
+
+.s-soft {
+  fill: none;
+  stroke: var(--wash);
+}
+
+.f-ink {
+  fill: var(--ink);
+}
+
+.f-text {
+  fill: var(--text);
+}
+
+.f-muted {
+  fill: var(--muted);
+}
+
+.f-line {
+  fill: var(--rule-strong);
+}
+
+.f-accent {
+  fill: var(--accent);
+}
+
+.f-accent-soft {
+  fill: var(--accent-wash);
+}
+
+.f-mark {
+  fill: var(--mark);
+}
+
+.f-mark-soft {
+  fill: var(--mark-wash);
+}
+
+.f-card {
+  fill: var(--raise);
+}
+
+.f-soft {
+  fill: var(--wash);
+}
+
+.w1 {
+  stroke-width: 1;
+}
+
+.w2 {
+  stroke-width: 2;
+}
+
+.dash {
+  stroke-dasharray: 5 5;
+}
+
+/* —— 代码 —— */
+main pre {
+  padding: var(--s-4);
+  overflow-x: auto;
+  border-radius: var(--r-2);
+  background: var(--wash);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs); /* 手机上小一号：一行多放四五个字符，少一些横向滚动 */
+  line-height: 1.65;
+  tab-size: 4;
+}
+
+@media (min-width: 700px) {
+  main pre {
+    font-size: var(--t-sm);
+  }
+}
+
+/* 浏览器给 <code> 的默认字体是 monospace，会盖掉 <pre> 上设的字体：让它跟着 <pre> 走 */
+main pre code {
+  font: inherit;
+}
+
+/* —— 公式：排版之前是 LaTeX 源码 —— */
+.math:not(.zx-math) {
+  font-family: var(--font-mono);
+  font-size: var(--em-sm);
+}
+
+div.math {
+  margin-block: 0 var(--flow);
+  overflow: auto hidden;
+  text-align: center;
+}
+
+/* 知序 · 版面骨架：页眉、目录栏、正文栏与页边 */
+
+/* 脚本接管期间先不显示，避免版面跳动；启动完成或失败时，加载器和运行时会去掉这个类。
+ * 用 display: none，不用 visibility: hidden：后者照样要排版。不是每个内核都会等脚本做完才排第一帧，
+ * 不等的那些会先给作者写的原样排一遍版，引擎改完再排一遍。页面不占版面，这头一遍就省掉了 */
+html.zx-js.zx-loading body {
+  display: none;
+}
+
+/* 翻页：旧页面留到新页面的第一帧，再交叉淡入 */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+html.zx-js body {
+  padding-top: var(--header-h);
+}
+
+.zx-skip {
+  position: fixed;
+  top: var(--s-2);
+  left: var(--s-2);
+  z-index: 40;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-1);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  text-decoration: none;
+  translate: 0 -300%;
+}
+
+.zx-skip:focus {
+  translate: 0;
+}
+
+/* “跳到正文”把焦点交给整块正文：这不是一个要让读者看见的控件，不画焦点框 */
+main:focus-visible,
+.zx-home:focus-visible {
+  outline: none;
+}
+
+.zx-alert {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: var(--s-3) var(--s-5);
+  border-bottom: 1px solid var(--bad);
+  background: var(--bad-wash);
+  color: var(--bad);
+  font-weight: 700;
+}
+
+/* —— 通用控件 —— */
+.zx-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.zx-tool {
+  position: relative;
+  display: grid;
+  flex: none;
+  width: var(--tool);
+  height: var(--tool);
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: var(--r-1);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-1),
+    color var(--dur-1);
+}
+
+.zx-tool:hover {
+  background: var(--wash);
+  color: var(--ink);
+}
+
+/* 手指点按：图标按钮看上去不变，能点到的范围扩到 44 像素；文字按钮直接加高 */
+@media (pointer: coarse) {
+  .zx-tool::after {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--s-1));
+  }
+
+  .zx-btn {
+    min-height: 44px;
+  }
+}
+
+.zx-btn {
+  display: inline-flex;
+  gap: var(--s-2);
+  align-items: center;
+  padding: var(--s-2) var(--s-4);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-1);
+  background: var(--raise);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--ui-md);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-1),
+    background-color var(--dur-1);
+}
+
+.zx-btn:hover:enabled {
+  border-color: var(--accent);
+}
+
+.zx-btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.zx-btn--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.zx-btn--primary:hover {
+  border-color: var(--accent-strong);
+  background: var(--accent-strong);
+}
+
+/* —— 页眉 —— */
+.zx-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  height: var(--header-h);
+  padding-inline: var(--s-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+  transition: translate var(--dur-2) var(--ease);
+}
+
+html.zx-away .zx-header:not(:focus-within) {
+  translate: 0 -100%;
+}
+
+.zx-brand {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  min-width: 0;
+  padding-inline: var(--s-1);
+  color: var(--ink);
+  font-size: var(--ui-md);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.zx-brand > svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--accent);
+}
+
+.zx-brand > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 书眉：读过标题之后，页眉中间显示当前讲与小节；点击回到顶部 */
+.zx-running {
+  flex: 1;
+  min-width: 0;
+  padding: var(--s-2);
+  overflow: hidden;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--ui-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden; /* 看不见的时候也不能被 Tab 选中 */
+  transition:
+    opacity var(--dur-2),
+    visibility var(--dur-2);
+}
+
+html.zx-past .zx-running {
+  opacity: 1;
+  visibility: visible;
+}
+
+.zx-tools {
+  display: flex;
+  flex: none;
+  gap: var(--s-1);
+  align-items: center;
+  margin-left: auto;
+}
+
+.zx-find > span,
+.zx-find > kbd,
+.zx-tool--wide {
+  display: none;
+}
+
+.zx-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 21;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: 0 0;
+  scale: 0 1; /* 读到哪儿，线就长到哪儿：shell.js 滚动时改这个值 */
+}
+
+/* —— 目录栏 —— */
+.zx-side {
+  display: none;
+}
+
+.zx-nav {
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+
+.zx-nav ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zx-nav-unit {
+  margin: var(--s-5) 0 var(--s-2);
+  padding-inline: var(--s-2);
+  color: var(--muted);
+  font-size: var(--ui-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.zx-nav-unit:first-child {
+  margin-top: 0;
+}
+
+.zx-nav-link {
+  display: grid;
+  grid-template-columns: 1.4em minmax(0, 1fr) auto;
+  gap: var(--s-1);
+  align-items: baseline;
+  padding: var(--s-2);
+  border-radius: var(--r-1);
+  color: var(--text);
+  font-size: var(--ui-md);
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.zx-nav-link:hover {
+  background: var(--wash);
+  color: var(--ink);
+}
+
+.zx-nav-n {
+  color: var(--muted);
+  font-size: var(--ui-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.zx-nav-link[aria-current='page'] {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* 读完的讲次带一枚小印 */
+.zx-nav-link.is-done::after,
+.zx-row.is-done > .zx-row-m::before {
+  content: '';
+  display: inline-block;
+  align-self: center;
+  width: 9px;
+  height: 9px;
+  margin-right: var(--s-1);
+  border-radius: var(--r-0);
+  background: var(--seal);
+  rotate: -8deg;
+  print-color-adjust: exact; /* 首页打印出来，读过的讲次照样带着小印 */
+}
+
+.zx-toc {
+  margin: var(--s-1) 0 var(--s-2) 1.25em;
+  border-left: 1px solid var(--rule);
+}
+
+.zx-toc a {
+  display: block;
+  margin-left: -1px;
+  padding: var(--s-1) var(--s-2) var(--s-1) calc(var(--s-4) - var(--bar));
+  border-left: var(--bar) solid transparent;
+  color: var(--muted);
+  font-size: var(--ui-sm);
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.zx-toc a:hover {
+  color: var(--ink);
+}
+
+.zx-toc a.is-active {
+  border-left-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* —— 正文栏 —— */
+html.zx-js main {
+  position: relative; /* 停靠的笔记面板按这个网格的栏来定位 */
+  display: grid;
+  grid-template-columns: minmax(var(--s-5), 1fr) minmax(0, var(--measure)) minmax(var(--s-5), 1fr);
+  padding-block: var(--s-5) var(--s-8); /* 手机上页眉下面少留一些：第一节的标题要落在第一屏里 */
+}
+
+html.zx-js main > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
+@media (min-width: 700px) {
+  html.zx-js main {
+    padding-top: var(--s-7);
+  }
+
+  .zx-find {
+    display: flex;
+    gap: var(--s-2);
+    width: auto;
+    min-width: 168px;
+    height: 34px;
+    align-items: center;
+    padding: 0 var(--s-2) 0 var(--s-3);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-1);
+    background: var(--wash);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: var(--ui-sm);
+  }
+
+  .zx-find > span {
+    display: inline;
+    flex: 1;
+    text-align: left;
+  }
+
+  .zx-find > kbd {
+    display: inline;
+    padding: 0 var(--s-1);
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--r-0);
+    background: var(--raise);
+    font-family: var(--font-mono);
+    font-size: var(--ui-xs);
+  }
+
+  .zx-tool--wide {
+    display: grid;
+  }
+}
+
+/* 宽屏：正文右侧留出页边，小节里普通段落的旁注一直排在里面；小节编号悬挂在左侧。
+ * 笔记停靠时页边归它，这些旁注和别处的一样收进浮层。“没有停靠着”这个条件用 :where() 包起来，不抬高选择器的优先级。 */
+@media (min-width: 1000px) {
+  html.zx-js main {
+    grid-template-columns:
+      minmax(var(--gutter), 1fr) minmax(0, var(--measure)) calc(var(--note-w) + var(--note-gap))
+      minmax(var(--s-5), 1fr);
+  }
+
+  h2[data-num] {
+    position: relative;
+  }
+
+  h2[data-num]::before {
+    position: absolute;
+    right: 100%;
+    margin-right: 0.5em;
+  }
+
+  /* 章首页：讲次是一个大号的数字，和小节编号一样悬挂在标题左侧，“第 4 讲”几个字让给它。
+   * 它排在标题第一行的行首，基线自然和标题对齐；宽度和负的外边距相抵，不占地方；行高是零，不撑高这一行 */
+  h1[data-num]::before {
+    content: attr(data-num);
+    display: inline-block;
+    width: 3em;
+    margin: 0 0.22em 0 -3.22em;
+    color: var(--muted);
+    font-size: var(--t-numeral);
+    font-weight: 400;
+    line-height: 0;
+    text-align: right;
+  }
+
+  .zx-kicker-n {
+    display: none;
+  }
+
+  :where(html:not(:has(.zx-dock > dialog[open]:not(:modal)))) .zx-note--margin:not(:popover-open) {
+    position: static;
+    display: block;
+    float: right;
+    clear: right;
+    width: var(--note-w);
+    max-width: none;
+    margin: 0.35em calc(-1 * (var(--note-w) + var(--note-gap))) var(--s-3) 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--muted);
+    font-size: var(--t-xs);
+    line-height: 1.65;
+  }
+
+  :where(html:not(:has(.zx-dock > dialog[open]:not(:modal)))) .zx-note--margin:not(:popover-open)::before {
+    content: attr(data-n);
+    margin-right: 0.5em;
+    color: var(--accent);
+    font-family: var(--font-sans);
+    font-weight: 700;
+  }
+
+  /* 正文栏里放不下的表格、代码和图伸进页边（figures.js 量出来的）。旁边已经有旁注的话，排到旁注下面 */
+  :where(html:not(:has(.zx-dock > dialog[open]:not(:modal)))) .zx-wide {
+    clear: right;
+    margin-right: calc(-1 * (var(--note-w) + var(--note-gap)));
+  }
+
+  /* 鼠标移到序号上，或者键盘选中它：页边里对应的那条旁注变深 */
+  .zx-ref:is(:hover, :focus-within) + .zx-note--margin:not(:popover-open) {
+    color: var(--ink);
+  }
+}
+
+@media (min-width: 1280px) {
+  html[data-side='on'] body {
+    display: grid;
+    grid-template-columns: var(--side-w) minmax(0, 1fr);
+  }
+
+  html[data-side='on'] .zx-side {
+    position: sticky;
+    top: var(--header-h);
+    display: block;
+    height: calc(100dvh - var(--header-h));
+    padding: var(--s-5) var(--s-3) var(--s-7) var(--s-4);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-strong) transparent;
+  }
+}
+
+/* 知序 · 正文组件
+ * 作者写的类名不带前缀；脚本补上的元素一律以 zx- 开头。 */
+
+/* —— 讲头：学习目标与导语 —— */
+.goals {
+  margin: var(--s-4) 0 0; /* 它是讲头的最后一项，下面不再留段距 */
+  padding: var(--s-3) 0 0;
+  border-top: 1px solid var(--rule);
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  list-style: none;
+}
+
+.goals::before {
+  content: '学完这一讲，你能';
+  display: block;
+  margin-bottom: var(--s-2);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+}
+
+.goals > li,
+.recap li {
+  position: relative;
+  padding-left: 1.7em;
+}
+
+/* 图标的画法（这个文件里都一样）：一块底色加蒙版。
+   -webkit-mask 照顾还不认无前缀写法的旧内核（手机上的内核常常偏旧）；
+   print-color-adjust 让图标在打印时不勾“背景图形”也印得出来 */
+.goals > li::before,
+.recap li::before {
+  content: '';
+  position: absolute;
+  top: 0.32em;
+  left: 0;
+  width: 1.05em;
+  height: 1.05em;
+  background: var(--accent);
+  -webkit-mask: var(--icon-check) center / contain no-repeat;
+  mask: var(--icon-check) center / contain no-repeat;
+  print-color-adjust: exact;
+}
+
+/* —— 本讲小结 —— */
+.recap {
+  margin-top: var(--s-8);
+  padding: var(--s-5) var(--s-5) var(--s-4);
+  border-radius: var(--r-2);
+  background: var(--wash);
+}
+
+.recap > h2 {
+  margin: 0 0 var(--s-3);
+  font-size: var(--t-lg);
+}
+
+.recap > ul {
+  margin-bottom: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* —— 小节编号 —— */
+h2[data-num]::before {
+  content: attr(data-num);
+  margin-right: 0.6em;
+  color: var(--muted);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+/* —— 小节标题后面的链接：悬停或键盘聚焦时出现，可从链接的菜单复制目标地址。
+ * 它在行里不占地方（宽度和负的外边距相抵）：标题在哪儿折行，有它没它都一样，最后一行排满了也不会被它挤出一个空行。
+ * 标题右边给它留了位置，它画在那儿，不伸出标题的框。窄屏上没有这个位置，触屏上没有“移上去”，都不显示 —— */
+.zx-anchor {
+  display: none;
+}
+
+@media (min-width: 700px) {
+  main > section > h2 {
+    padding-right: 1.2em;
+  }
+
+  .zx-anchor {
+    display: inline-block;
+    width: 0.95em;
+    margin: 0 -1.1em 0 0.15em; /* 左边空出一点：键盘选中时，焦点框不压着标题的最后一个字 */
+    color: var(--muted);
+    text-align: right;
+    opacity: 0;
+    transition: opacity var(--dur-1);
+  }
+
+  .zx-anchor > .zx-icon {
+    width: 0.7em;
+    height: 0.7em;
+  }
+
+  h2:hover > .zx-anchor {
+    opacity: 1;
+  }
+
+  /* 键盘走到它：立刻显示，不带过渡 */
+  .zx-anchor:focus-visible {
+    opacity: 1;
+    transition: none;
+  }
+
+  .zx-anchor:hover {
+    color: var(--accent);
+  }
+}
+
+@media (hover: none) {
+  .zx-anchor {
+    display: none;
+  }
+}
+
+/* —— 提示卡：Material 配色，标题与图标由类型决定 —— */
+.callout {
+  --c: var(--c-note);
+  --icon: var(--icon-note);
+  --title: '补充';
+  --icon-size: 20px;
+  position: relative;
+  padding: 0 var(--s-4) var(--s-3);
+  border: 1px solid var(--c);
+  border-radius: var(--r-2);
+  font-size: var(--t-sm);
+  line-height: 1.75;
+}
+
+.callout.insight {
+  --c: var(--c-insight);
+  --icon: var(--icon-insight);
+  --title: '直觉';
+}
+
+.callout.memory {
+  --c: var(--c-memory);
+  --icon: var(--icon-memory);
+  --title: '记忆法';
+}
+
+.callout.question {
+  --c: var(--c-question);
+  --icon: var(--icon-question);
+  --title: '想一想';
+}
+
+.callout.pitfall {
+  --c: var(--c-pitfall);
+  --icon: var(--icon-pitfall);
+  --title: '易错';
+}
+
+.callout.danger {
+  --c: var(--c-danger);
+  --icon: var(--icon-danger);
+  --title: '警告';
+}
+
+.callout.exam {
+  --c: var(--c-exam);
+  --icon: var(--icon-exam);
+  --title: '考点';
+}
+
+div.callout::before,
+details.callout > summary {
+  display: block;
+  margin: 0 calc(-1 * var(--s-4)) var(--s-3);
+  padding: var(--s-2) calc(var(--s-4) + var(--icon-size) + var(--s-2));
+  border-radius: var(--r-inner) var(--r-inner) 0 0;
+  background: color-mix(in srgb, var(--c) var(--callout-tint), transparent);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--ui-md);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+}
+
+div.callout::before {
+  content: var(--title);
+}
+
+div.callout[data-title]::before {
+  content: attr(data-title);
+}
+
+details.callout > summary {
+  position: relative;
+  cursor: pointer;
+  list-style: none;
+}
+
+details.callout:not([open]) {
+  padding-bottom: 0;
+}
+
+details.callout:not([open]) > summary {
+  margin-bottom: 0;
+  border-radius: var(--r-inner);
+}
+
+div.callout::after,
+details.callout > summary::before {
+  content: '';
+  position: absolute;
+  top: var(--s-2);
+  left: var(--s-4);
+  width: var(--icon-size);
+  height: var(--icon-size);
+  background: var(--c);
+  -webkit-mask: var(--icon) center / contain no-repeat;
+  mask: var(--icon) center / contain no-repeat;
+  print-color-adjust: exact;
+}
+
+details.callout > summary::after {
+  content: '';
+  position: absolute;
+  top: 11px;
+  right: var(--s-4);
+  width: 14px;
+  height: 14px;
+  background: var(--c);
+  -webkit-mask: var(--icon-chevron) center / contain no-repeat;
+  mask: var(--icon-chevron) center / contain no-repeat;
+  print-color-adjust: exact;
+  transition: rotate var(--dur-1);
+}
+
+details.callout[open] > summary::after {
+  rotate: 90deg;
+}
+
+.callout > :last-child {
+  margin-bottom: 0;
+}
+
+/* —— 折叠 —— */
+main details:not(.callout) {
+  border-block: 1px solid var(--rule);
+}
+
+main details:not(.callout):has(+ details:not(.callout)) {
+  margin-bottom: -1px;
+}
+
+main details:not(.callout)[open] {
+  padding-bottom: var(--s-3);
+}
+
+main details:not(.callout) > summary {
+  position: relative;
+  display: block;
+  padding: var(--s-3) 0 var(--s-3) 1.5em;
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+main details:not(.callout) > summary::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--s-3) + 0.5lh - 7px);
+  left: 0;
+  width: 14px;
+  height: 14px;
+  background: var(--muted);
+  -webkit-mask: var(--icon-chevron) center / contain no-repeat;
+  mask: var(--icon-chevron) center / contain no-repeat;
+  print-color-adjust: exact;
+  transition: rotate var(--dur-1);
+}
+
+main details:not(.callout)[open] > summary::before {
+  rotate: 90deg;
+}
+
+main summary::-webkit-details-marker {
+  display: none;
+}
+
+main details > :last-child {
+  margin-bottom: 0;
+}
+
+/* —— 代码块 —— */
+.zx-code {
+  position: relative;
+  margin-block: 0 var(--flow);
+}
+
+.zx-code > pre {
+  margin: 0;
+}
+
+.zx-code-bar {
+  display: flex;
+  gap: var(--s-3);
+  justify-content: space-between;
+  padding: var(--s-2) calc(var(--s-1) + var(--tool) + var(--s-2)) var(--s-2) var(--s-4); /* 右边给复制按钮让位 */
+  border-bottom: 1px solid var(--rule);
+  border-radius: var(--r-2) var(--r-2) 0 0;
+  background: var(--wash);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: var(--ui-sm);
+}
+
+/* 文件名很长时在栏内折行，不把整页撑宽 */
+.zx-code-file {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.zx-code-bar + pre {
+  border-radius: 0 0 var(--r-2) var(--r-2);
+}
+
+.zx-copy {
+  position: absolute;
+  top: var(--s-1);
+  right: var(--s-1);
+  opacity: 0;
+  transition: opacity var(--dur-1);
+}
+
+.zx-code:hover > .zx-copy,
+.zx-copy:focus-visible,
+.zx-copy.is-done {
+  opacity: 1;
+}
+
+.zx-copy.is-done {
+  color: var(--good);
+}
+
+.zx-lines {
+  display: grid;
+  min-width: max-content;
+}
+
+.zx-line {
+  min-height: 1lh;
+  margin-inline: calc(-1 * var(--s-4));
+  padding-inline: calc(var(--s-4) - var(--bar)) var(--s-4);
+  border-left: var(--bar) solid transparent;
+}
+
+.zx-line[data-n]::before {
+  content: attr(data-n);
+  display: inline-block;
+  width: 2.2em;
+  margin-right: 1.2em;
+  color: var(--muted);
+  text-align: right;
+  user-select: none;
+}
+
+.zx-line.is-marked {
+  border-left-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.zx-line.is-lit {
+  border-left-color: var(--mark);
+  background: var(--lit);
+}
+
+.code-notes {
+  margin-top: calc(var(--s-2) - var(--flow));
+  padding: 0;
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  list-style: none;
+}
+
+.code-notes > li {
+  position: relative;
+  margin: 0;
+  padding: var(--s-1) var(--s-2) var(--s-1) 5.4em;
+  border-radius: var(--r-1);
+}
+
+.code-notes > li::before {
+  content: '第 ' attr(data-line) ' 行';
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: var(--ui-xs);
+  font-weight: 700;
+  line-height: 2;
+  position: absolute;
+  left: 0;
+  width: 4.6em;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.code-notes > li.is-lit {
+  background: var(--wash);
+}
+
+/* 语法着色：highlight.js 的类名映射到七种颜色 */
+.hljs-comment,
+.hljs-quote,
+.hljs-meta {
+  color: var(--code-comment);
+}
+
+.hljs-keyword,
+.hljs-literal,
+.hljs-selector-tag,
+.hljs-section,
+.hljs-doctag {
+  color: var(--code-keyword);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition {
+  color: var(--code-string);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet {
+  color: var(--code-number);
+}
+
+.hljs-title,
+.hljs-name {
+  color: var(--code-title);
+}
+
+.hljs-type,
+.hljs-built_in,
+.hljs-title.class_ {
+  color: var(--code-type);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-property,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-selector-class,
+.hljs-selector-id {
+  color: var(--code-attr);
+}
+
+.hljs-deletion {
+  color: var(--bad);
+}
+
+.hljs-strong {
+  font-weight: 700;
+}
+
+/* —— 禁则：公式或旁注序号和它后面的标点留在同一行（keep.js）；
+   长公式里除最后一段之外的部分照常折行（旁注的正文自己写明了照常折行） —— */
+.zx-keep {
+  white-space: nowrap;
+}
+
+.zx-keep .zx-wrap {
+  white-space: normal;
+}
+
+/* 很长的网址和标识符在字符之间断开，不再整个掉到下一行、把上一行的字距拉开。
+   断点是 keep.js 放的 <wbr>；每一簇（一个字符连着它后面的收尾标点）自己不折行，标点就不会落到行首 */
+.zx-long {
+  white-space: nowrap;
+}
+
+/* —— 公式 —— */
+html.zx-js .math:not(.zx-math) {
+  visibility: hidden;
+}
+
+.zx-math .katex {
+  font-size: var(--em-math);
+}
+
+.zx-math .katex-display {
+  margin: 0;
+}
+
+div.zx-math {
+  padding-block: var(--s-1);
+}
+
+/* 带编号的公式：公式居中，编号靠右。公式太长时在中间那一栏里滚动，编号不参与滚动、始终完整 */
+div.zx-math[data-label] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, max-content) minmax(max-content, 1fr);
+  align-items: center;
+}
+
+div.zx-math[data-label] > .katex-display {
+  overflow: auto hidden;
+}
+
+div.zx-math[data-label]::before {
+  content: '';
+}
+
+div.zx-math[data-label]::after {
+  content: attr(data-label);
+  justify-self: end;
+  color: var(--muted);
+  font-size: var(--t-sm);
+}
+
+/* —— 表格外壳与图表编号 —— */
+/* 表格太宽时在外壳里横向滚动。外壳是尺寸容器，表题按它的宽度排，并粘在左边：
+   表格滚到哪里，表题都完整可见，同时仍然是表格的一部分（辅助技术读到的表格名称就是它） */
+.zx-table {
+  margin-block: 0 var(--flow);
+  overflow-x: auto;
+  container-type: inline-size;
+}
+
+.zx-table caption {
+  position: sticky;
+  left: 0;
+  width: 100cqi;
+}
+
+.zx-table > table {
+  margin: 0;
+}
+
+/* 文字单元格的内容区至少五个字宽（单元格左右各有 0.9em 的内边距） */
+main td:not(.num) {
+  min-width: 6.8em;
+}
+
+figcaption[data-label]::before,
+caption[data-label]::before {
+  content: attr(data-label) '\3000';
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.zx-zoom > svg,
+.zx-zoom > img {
+  cursor: zoom-in;
+}
+
+/* 放大按钮：只有显示得比原图小的图才有；鼠标移上去或键盘聚焦时出现 */
+.zx-zoom-btn {
+  position: absolute;
+  top: var(--s-2);
+  right: var(--s-2);
+  display: none;
+  border: 1px solid var(--rule);
+  background: var(--raise);
+  opacity: 0;
+  transition: opacity var(--dur-1);
+}
+
+.zx-zoom > .zx-zoom-btn {
+  display: grid;
+}
+
+.zx-zoom:hover > .zx-zoom-btn,
+.zx-zoom-btn:focus-visible {
+  opacity: 1;
+}
+
+/* 触屏没有“移上去”：复制和放大的按钮一直显示 */
+@media (hover: none) {
+  .zx-copy,
+  .zx-zoom-btn {
+    opacity: 1;
+  }
+}
+
+/* —— 步骤 —— */
+.steps {
+  padding: 0;
+  counter-reset: zx-step;
+  list-style: none;
+}
+
+.steps > li {
+  position: relative;
+  margin: 0;
+  padding: 0 0 var(--s-4) 3em;
+  counter-increment: zx-step;
+}
+
+.steps > li::before {
+  content: counter(zx-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  width: 1.9em;
+  height: 1.9em;
+  place-items: center;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-pill);
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 连着上下两步的竖线。画成边框，不用底色：打印时浏览器默认不印底色 */
+.steps > li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 2.2em;
+  bottom: 0.3em;
+  left: 0.95em;
+  border-left: 1px solid var(--rule-strong);
+}
+
+.steps h4 {
+  margin: 0;
+  line-height: 1.9;
+}
+
+.steps p {
+  margin-bottom: 0.4em;
+}
+
+/* —— 流程 —— */
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flow > li {
+  position: relative;
+  display: grid;
+  align-content: center;
+  margin: 0;
+  padding: 0.45em 1.1em;
+  border-radius: var(--r-1);
+  background: var(--wash);
+  color: var(--ink);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  text-align: center;
+}
+
+/* 箭头跟在前一格后面：折行时它留在上一行的末尾，不会落到下一行的行首 */
+.flow > li:not(:last-child) {
+  margin-right: var(--s-6);
+}
+
+.flow > li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(100% + var(--s-2));
+  width: 16px;
+  height: 16px;
+  background: var(--muted);
+  -webkit-mask: var(--icon-chevron) center / contain no-repeat;
+  mask: var(--icon-chevron) center / contain no-repeat;
+  print-color-adjust: exact;
+  translate: 0 -50%;
+}
+
+.flow small {
+  display: block;
+  color: var(--muted);
+  font-size: var(--t-xs);
+  font-weight: 400;
+}
+
+/* —— 时间线 —— */
+.timeline {
+  margin-left: calc(0.35em + 1px);
+  padding: 0;
+  list-style: none;
+}
+
+.timeline > li {
+  position: relative;
+  margin: 0;
+  padding: 0 0 var(--s-4) var(--s-5);
+}
+
+.timeline > li::before {
+  content: '';
+  position: absolute;
+  top: 0.62em;
+  left: -5px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--accent);
+  border-radius: var(--r-pill);
+  background: var(--paper);
+}
+
+/* 竖线从这一项的圆点接到下一项的圆点，最后一项后面没有线。和步骤的竖线一样画成边框 */
+.timeline > li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: calc(0.62em + 9px);
+  bottom: -0.62em;
+  left: -1px;
+  border-left: 1px solid var(--rule-strong);
+}
+
+.timeline time {
+  display: block;
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* —— 树：嵌套的列表画成带连线的树（目录结构、递归调用、分类体系）——
+ * 子节点左边一条竖线接着上下两项，一条横线指向自己；一组里的最后一项，竖线只画到横线那里。
+ * 各项之间不留外边距（留的话竖线会断），行距用内边距撑开 */
+.tree {
+  padding: 0;
+  line-height: var(--lh-snug);
+  list-style: none;
+}
+
+.tree ul {
+  margin: 0 0 0 0.5em;
+  padding: 0;
+  list-style: none;
+}
+
+.tree li {
+  position: relative;
+  margin: 0;
+  padding-block: 0.15em;
+}
+
+.tree ul > li {
+  padding-left: 1.5em;
+}
+
+.tree ul > li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-left: 1px solid var(--rule-strong);
+}
+
+.tree ul > li:last-child::before {
+  bottom: auto;
+  height: calc(0.15em + 0.5lh);
+}
+
+.tree ul > li::after {
+  content: '';
+  position: absolute;
+  top: calc(0.15em + 0.5lh);
+  left: 0;
+  width: 1.1em;
+  border-top: 1px solid var(--rule-strong);
+}
+
+/* —— 并列卡片 —— */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12em), 1fr)); /* 正文栏里正好放得下三张 */
+  gap: var(--s-3);
+}
+
+/* 四张卡片排成二乘二，而不是三张加一张 */
+.cards:has(> :nth-child(4):last-child) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16em), 1fr));
+}
+
+.cards > div {
+  padding: var(--s-4);
+  border-radius: var(--r-2);
+  background: var(--wash);
+  font-size: var(--t-sm);
+  line-height: 1.75;
+}
+
+.cards h4 {
+  margin: 0 0 var(--s-1);
+}
+
+.cards > div > :last-child {
+  margin-bottom: 0;
+}
+
+/* —— 例题、小测、演示：可以动手的面板 ——
+ * 上下各一条线界定，不加整圈的框：和三线表、折叠块是同一种语言。相邻的两块共用中间那条线。 */
+.example,
+.quiz,
+.stepper {
+  padding-block: var(--s-4);
+  border-block: 1px solid var(--rule-strong);
+}
+
+:is(.example, .quiz, .stepper) + :is(.example, .quiz, .stepper) {
+  margin-top: calc(-1 * var(--flow) - 1px);
+}
+
+.example::before,
+.quiz::before,
+.stepper::before {
+  content: attr(data-label) '\3000' attr(data-title);
+  display: block;
+  margin-bottom: var(--s-2);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: var(--ui-sm);
+  font-weight: 700;
+}
+
+.example:not([data-label])::before {
+  content: '例题\3000' attr(data-title);
+}
+
+.quiz:not([data-label])::before {
+  content: '小测';
+}
+
+.stepper:not([data-label])::before {
+  content: '演示\3000' attr(data-title);
+}
+
+.example > :last-child,
+.quiz > :last-child {
+  margin-bottom: 0;
+}
+
+/* 解答放在例题的最后：它那一行直接贴着面板的底线 */
+.example > .answer {
+  border-bottom: 0;
+}
+
+.example:has(> .answer:last-child) {
+  padding-bottom: 0;
+}
+
+/* —— 小测 —— */
+.quiz > ol {
+  list-style: upper-alpha;
+}
+
+.quiz[data-answer]:not([data-kind])::after {
+  content: '答案：' attr(data-answer);
+  color: var(--muted);
+  font-size: var(--t-sm);
+}
+
+.quiz[data-kind] > ol {
+  display: grid;
+  gap: var(--s-1);
+  padding: 0;
+  counter-reset: zx-opt;
+  list-style: none;
+}
+
+.quiz[data-kind] > ol > li {
+  margin: 0;
+  counter-increment: zx-opt;
+}
+
+.zx-opt {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.6em minmax(0, 1fr) 1.1em;
+  gap: var(--s-2);
+  padding: 0.4em 0.6em;
+  border-radius: var(--r-1);
+  cursor: pointer;
+  transition: background-color var(--dur-1);
+}
+
+/* 选项前的字母标记：单选题是圆的，多选题是方的，选中后填实 */
+.zx-opt::before {
+  content: counter(zx-opt, upper-alpha);
+  display: grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-pill);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+
+.quiz[data-kind='multi'] .zx-opt::before {
+  border-radius: var(--r-0);
+}
+
+.zx-opt:has(input:checked)::before {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.zx-opt::after {
+  content: '';
+  align-self: center;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.zx-opt > input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.zx-opt:has(input:enabled):hover {
+  background: var(--wash);
+}
+
+.zx-opt:has(input:checked) {
+  background: var(--accent-wash);
+}
+
+.zx-opt:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.zx-opt:has(input:disabled) {
+  cursor: default;
+}
+
+li[data-mark='right'] > .zx-opt {
+  background: var(--good-wash);
+}
+
+li[data-mark='right'] > .zx-opt::after {
+  background: var(--good);
+  -webkit-mask: var(--icon-check) center / contain no-repeat;
+  mask: var(--icon-check) center / contain no-repeat;
+  print-color-adjust: exact;
+}
+
+li[data-mark='wrong'] > .zx-opt {
+  background: var(--bad-wash);
+}
+
+li[data-mark='wrong'] > .zx-opt::after {
+  background: var(--bad);
+  -webkit-mask: var(--icon-cross) center / contain no-repeat;
+  mask: var(--icon-cross) center / contain no-repeat;
+  print-color-adjust: exact;
+}
+
+/* 判定的反馈：揭晓时对勾和叉弹出来；答对了，那句话也跟着弹一下；答错了，那句话左右晃两下 */
+li[data-mark] > .zx-opt::after,
+.quiz[data-state='right'] .zx-quiz-status {
+  animation: zx-pop var(--dur-2) var(--ease);
+}
+
+.quiz:is([data-state='wrong'], [data-state='retry']) .zx-quiz-status {
+  animation: zx-shake var(--dur-3) var(--ease);
+}
+
+@keyframes zx-pop {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+@keyframes zx-shake {
+  20% {
+    translate: calc(-1 * var(--s-1)) 0;
+  }
+
+  40% {
+    translate: var(--s-1) 0;
+  }
+
+  60% {
+    translate: calc(var(--s-1) / -2) 0;
+  }
+
+  80% {
+    translate: calc(var(--s-1) / 2) 0;
+  }
+}
+
+.hint {
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-1);
+  background: var(--mark-wash);
+  font-size: var(--t-sm);
+}
+
+.hint::before {
+  content: '提示\3000';
+  color: var(--mark);
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+
+.explain {
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--rule);
+  font-size: var(--t-sm);
+}
+
+.explain::before {
+  content: '解析';
+  display: block;
+  margin-bottom: var(--s-1);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: var(--ui-sm);
+  font-weight: 700;
+}
+
+.explain > :last-child {
+  margin-bottom: 0;
+}
+
+.zx-quiz-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  align-items: center;
+  margin-top: var(--s-3);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-md);
+}
+
+.zx-quiz-status {
+  font-weight: 700;
+}
+
+.quiz[data-state='right'] .zx-quiz-status {
+  color: var(--good);
+}
+
+.quiz[data-state='wrong'] .zx-quiz-status,
+.quiz[data-state='retry'] .zx-quiz-status {
+  color: var(--bad);
+}
+
+.zx-fill {
+  flex: 1 1 10em;
+  max-width: 16em;
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-1);
+  background: var(--raise);
+  color: var(--ink);
+  font: inherit;
+}
+
+/* —— 步进演示 —— */
+.stepper[data-step] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.stepper[data-step] > figure {
+  grid-area: 2 / 1;
+  margin: 0;
+  visibility: hidden;
+}
+
+.stepper[data-step] > figure.is-current {
+  visibility: visible;
+}
+
+.stepper:not([data-step]) > figure {
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--rule);
+}
+
+.stepper figcaption {
+  min-height: 3.2em;
+  color: var(--text);
+  text-align: left;
+}
+
+.zx-stepper-bar {
+  display: flex;
+  grid-row: 3;
+  gap: var(--s-3);
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+
+.zx-stepper-count {
+  min-width: 3.5em;
+  color: var(--muted);
+  font-size: var(--ui-sm);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+/* 一排格子永远排成一排：地方不够时格子一起变窄，窄到放不下内容了才在自己里面横向滚动 */
+.cells {
+  display: grid;
+  grid-auto-columns: minmax(min-content, 2.6em);
+  grid-auto-flow: column;
+  gap: var(--s-1);
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding-bottom: 1.7em;
+  overflow-x: auto;
+}
+
+.cells > span {
+  position: relative;
+  display: grid;
+  height: 2.6em;
+  padding-inline: 0.3em;
+  place-items: center;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-0);
+  background: var(--raise);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+}
+
+.cells > .on {
+  border-color: var(--accent);
+}
+
+.cells > .hit {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.cells > .off {
+  border-color: var(--rule);
+  background: var(--wash);
+  color: var(--muted);
+}
+
+.cells > [data-label]::after {
+  content: attr(data-label);
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 50%;
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: var(--ui-xs);
+  font-weight: 700;
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
+/* —— 选项卡 —— */
+.tabs:not(.zx-tabs) > [data-tab]::before {
+  content: attr(data-tab);
+  display: block;
+  margin-bottom: var(--s-1);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--ui-md);
+  font-weight: 700;
+}
+
+.tabs > [data-tab] > :last-child {
+  margin-bottom: 0;
+}
+
+.zx-tablist {
+  position: relative;
+  display: flex;
+  gap: var(--s-1);
+  margin-bottom: var(--s-3);
+  overflow-x: auto;
+  /* 底边的线画成背景，指示条正好盖在它上面 */
+  background: linear-gradient(var(--rule), var(--rule)) bottom / 100% 1px no-repeat;
+}
+
+/* 指示条：一条画在选中的选项卡下面的线，位置和宽度由脚本量出来（widgets.js）。
+ * 用边框画，强制配色下也看得见。只有读者正在操作这一组选项卡时它才滑过去；页面刚打开、窗口变宽变窄时直接就位 */
+.zx-tablist::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--tab-w);
+  border-top: var(--bar) solid var(--accent);
+  translate: var(--tab-x) 0;
+}
+
+.zx-tablist:is(:hover, :focus-within)::after {
+  transition:
+    translate var(--dur-2) var(--ease),
+    width var(--dur-2) var(--ease);
+}
+
+.zx-tab {
+  padding: var(--s-2) var(--s-3);
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: var(--ui-md);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.zx-tab[aria-selected='true'] {
+  color: var(--ink);
+}
+
+/* —— 任务清单 —— */
+.tasks {
+  list-style: '☐\3000';
+}
+
+.zx-tasks {
+  padding: 0;
+  list-style: none;
+}
+
+.zx-task {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--s-3);
+  cursor: pointer;
+}
+
+.zx-task > input {
+  position: absolute;
+  opacity: 0;
+}
+
+.zx-box {
+  display: grid;
+  width: 1.15em;
+  height: 1.15em;
+  margin-top: 0.36em;
+  place-items: center;
+  border: 1.5px solid var(--rule-strong);
+  border-radius: var(--r-0);
+  background: var(--raise);
+}
+
+.zx-task > input:checked + .zx-box {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.zx-task > input:checked + .zx-box::after {
+  content: '';
+  width: 0.85em;
+  height: 0.85em;
+  background: var(--on-accent);
+  -webkit-mask: var(--icon-check) center / contain no-repeat;
+  mask: var(--icon-check) center / contain no-repeat;
+  print-color-adjust: exact;
+}
+
+.zx-task > input:focus-visible + .zx-box {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.zx-task > input:checked ~ .zx-task-text {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+/* —— 旁注的序号 —— */
+/* 序号贴着它标注的那个字，不自己落到行首：序号开头垫一个不占地方的词连接符（U+2060），它和前面那个字之间
+   不许断行。那个字写在加粗、行内代码、术语、链接里也一样，页面结构不用动。
+   词连接符和它后面的按钮之间本来是能断的（按钮在浏览器眼里是“原子”，原子前后一律可以断行）；
+   序号都在不折行的 .zx-keep 里（keep.js 给每个序号包的），所以断不开 */
+.zx-ref::before {
+  content: '\2060';
+}
+
+.zx-ref > button {
+  position: relative;
+  display: inline;
+  padding: 0 0.2em;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* 序号很小：把可点按的范围向四周扩一圈，不影响排版 */
+.zx-ref > button::after {
+  content: '';
+  position: absolute;
+  inset: -10px -8px;
+}
+
+/* 搜索或术语表带到这一页的词：用自定义高亮标出来，不改动页面结构 */
+::highlight(zx-find) {
+  background-color: var(--mark-ink);
+  color: var(--ink);
+}
+
+/* —— 浮层：术语的定义（.zx-pop），和收着的旁注（.zx-note）——
+ * 都是原生的 popover：平时不显示，弹出来时在页面的最上层。位置由脚本定在锚点旁边，跟着页面一起滚动。
+ * 旁注写在段落中间，段落的对齐、不折行这些设定不该带进浮层，所以这里逐项写明。
+ * 宽屏上排在页边里的旁注是另一副样子，见 layout.css。 */
+main dfn[tabindex] {
+  cursor: help;
+}
+
+.zx-pop,
+.zx-note {
+  position: absolute;
+  inset: auto;
+  width: max-content;
+  max-width: min(22em, calc(100vw - 2 * var(--s-5))); /* 手机上不比正文栏宽 */
+  margin: 0;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-2);
+  background: var(--raise);
+  box-shadow: 0 8px 28px var(--shade);
+  color: var(--text);
+  font-family: var(--font-read);
+  font-weight: var(--w-body);
+  font-size: var(--t-sm);
+  line-height: var(--lh-snug);
+  text-align: left;
+  white-space: normal;
+}
+
+.zx-pop:popover-open,
+.zx-note:popover-open {
+  animation: zx-appear var(--dur-1) var(--ease);
+}
+
+.zx-pop > b {
+  display: block;
+  color: var(--ink);
+}
+
+.zx-pop > a {
+  display: block;
+  margin-top: var(--s-1);
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-xs);
+}
+
+/* —— 讲头 ——
+ * 和第一节之间：手机上只有小节标题自己的上边距；屏幕够宽时再多留一些 */
+@media (min-width: 700px) {
+  .zx-head {
+    margin-bottom: var(--s-5);
+  }
+
+  .goals {
+    margin-top: var(--s-5);
+    padding-top: var(--s-4);
+  }
+}
+
+.zx-kicker,
+.zx-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-3);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+  line-height: var(--lh-snug);
+}
+
+.zx-kicker {
+  margin: 0 0 var(--s-3);
+}
+
+.zx-meta {
+  margin: var(--s-4) 0 0;
+}
+
+.zx-kicker > span:not(:last-child),
+.zx-meta > span:not(:last-child) {
+  padding-right: var(--s-3);
+  border-right: 1px solid var(--rule-strong);
+}
+
+.zx-resume {
+  margin: var(--s-4) 0 0;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-1);
+  background: var(--accent-wash);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-md);
+}
+
+/* —— 讲末：盖章与上下讲 —— */
+.zx-foot {
+  margin-top: var(--s-7);
+}
+
+.zx-finish {
+  display: flex;
+  gap: var(--s-5);
+  align-items: center;
+  padding-block: var(--s-5);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+
+.zx-finish-title,
+.zx-finish-note {
+  margin: 0;
+}
+
+.zx-finish-title {
+  color: var(--ink);
+  font-family: var(--font-read);
+  font-size: var(--t-lg);
+  font-weight: 700;
+}
+
+.zx-finish-note {
+  color: var(--muted);
+  font-size: var(--ui-md);
+}
+
+.zx-seal-slot {
+  display: grid;
+  flex: none;
+  width: 92px;
+  height: 92px;
+  padding: 0;
+  place-items: center;
+  border: 1.5px dashed var(--rule-strong);
+  border-radius: var(--r-1);
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-kai);
+  font-size: var(--ui-lg);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-1),
+    color var(--dur-1);
+}
+
+.zx-seal-slot:hover {
+  border-color: var(--seal);
+  color: var(--seal);
+}
+
+.zx-seal-slot[aria-pressed='true'] {
+  border-color: transparent;
+}
+
+.zx-seal {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--seal);
+  rotate: -6deg;
+}
+
+.zx-seal rect {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 5.5;
+}
+
+.zx-seal text {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 0.9;
+  font-family: var(--font-kai);
+  font-size: var(--svg-seal);
+  text-anchor: middle;
+}
+
+.zx-seal.is-fresh {
+  animation: zx-stamp var(--dur-3) var(--ease);
+}
+
+@keyframes zx-stamp {
+  from {
+    opacity: 0;
+    scale: 1.7;
+    rotate: -14deg;
+  }
+
+  55% {
+    opacity: 1;
+    scale: 0.94;
+  }
+}
+
+.zx-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-4);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--rule);
+}
+
+.zx-pager > a {
+  display: block;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  text-decoration: none;
+}
+
+.zx-pager > a:hover {
+  color: var(--accent);
+}
+
+.zx-pager > a > span {
+  display: block;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: var(--ui-sm);
+  font-weight: 400;
+}
+
+.zx-pager > [rel='next'] {
+  grid-column: 2;
+  text-align: right;
+}
+
+/* 打印时附在讲末的参考答案；屏幕上不显示 */
+.zx-answers {
+  display: none;
+}
+
+/* 知序 · 首页：一本摊开的书。左页是封面，右页是目录。 */
+
+.zx-home {
+  max-width: 1180px;
+  margin-inline: auto;
+  padding: 0 var(--s-5) var(--s-8);
+  font-family: var(--font-read);
+  font-weight: var(--w-body);
+}
+
+.zx-spread {
+  display: grid;
+  gap: var(--s-7);
+  padding-block: var(--s-7);
+}
+
+/* —— 封面 —— */
+.zx-cover {
+  position: relative;
+}
+
+.zx-cover > h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--t-display);
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.zx-cover-sub {
+  margin: var(--s-4) 0 0;
+  color: var(--text);
+  font-size: var(--t-lg);
+  line-height: 1.6;
+}
+
+.zx-cover-desc {
+  max-width: 30em;
+  margin: var(--s-4) 0 0;
+  color: var(--muted);
+  font-size: var(--t-md);
+  line-height: 1.8;
+}
+
+/* 阶梯：每讲一级，可以点。读完的台阶是朱砂色；接下来要读的那一级，编号立在一个圆点里。
+ * 每一级是一栏，整栏都能点：编号在上，下面是一个只画上边（踏面）和左边（踢面）的小方块，方块垫高 n 级。
+ * 讲次的名字平时不显示；鼠标移到哪一级，它就出现在阶梯下面“共几讲”那一行的位置上。 */
+.zx-stairs {
+  position: relative;
+  display: grid;
+  gap: var(--s-4);
+  width: 100%;
+  margin-top: var(--s-6);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-xs);
+  line-height: var(--lh-snug);
+}
+
+.zx-flight {
+  display: flex;
+  align-items: flex-end;
+}
+
+.zx-flight > a {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  max-width: 96px;
+  color: var(--muted);
+  text-align: center;
+  text-decoration: none;
+}
+
+/* 一个单元的最后一级：长一点的平台 */
+.zx-flight > .is-landing {
+  flex-grow: 1.6;
+  max-width: 154px;
+}
+
+/* 踏面和踢面。踢面的下端多画一个线宽，压住前一级踏面的端头：拐角上没有缺口 */
+.zx-flight > a::after {
+  content: '';
+  height: calc(var(--rise) + var(--bar));
+  margin-bottom: calc(var(--rise) * var(--n) - var(--bar));
+  border: solid var(--rule-strong);
+  border-width: var(--bar) 0 0 var(--bar);
+}
+
+.zx-flight > .is-done {
+  color: var(--seal);
+}
+
+.zx-flight > .is-done::after {
+  border-color: var(--seal);
+}
+
+.zx-flight > a:hover {
+  color: var(--ink);
+}
+
+.zx-flight > a:hover::after {
+  border-color: var(--ink);
+}
+
+.zx-flight b {
+  margin-bottom: var(--s-1);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.zx-flight > .is-next > b {
+  align-self: center;
+  min-width: 1lh;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  print-color-adjust: exact;
+}
+
+.zx-flight span {
+  position: absolute;
+  inset: calc(100% + var(--s-3)) 0 auto;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: var(--ui-md);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  visibility: hidden;
+}
+
+.zx-flight > a:hover > span {
+  visibility: visible;
+}
+
+.zx-stairs:has(a:hover) + .zx-cover-stat {
+  visibility: hidden;
+}
+
+.zx-cover-stat {
+  margin: var(--s-3) 0 0;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-md);
+  line-height: var(--lh-snug);
+}
+
+/* “继续阅读”和讲次的名字是两截：手机上一行放不下时从中间断开，不把最后一两个字甩到下一行 */
+.zx-cover-go {
+  flex-wrap: wrap;
+  gap: 0 var(--s-4);
+  margin-top: var(--s-5);
+  padding: var(--s-3) var(--s-5);
+  font-size: var(--ui-lg);
+}
+
+/* 封面上的错题入口：一行安静的链接，排在主按钮下面，只有它的文字那么宽 */
+.zx-cover-review {
+  display: block;
+  width: fit-content;
+  margin-top: var(--s-3);
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-md);
+  text-underline-offset: 0.22em;
+}
+
+.zx-cover-author {
+  margin: var(--s-6) 0 0;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+}
+
+.zx-cover-seal {
+  width: 104px;
+  height: 104px;
+  margin-top: var(--s-5);
+}
+
+/* —— 目录 —— */
+.zx-part + .zx-part {
+  margin-top: var(--s-8);
+}
+
+.zx-part > h2 {
+  margin: 0 0 var(--s-5);
+  color: var(--ink);
+  font-size: var(--t-lg);
+  font-weight: 700;
+  letter-spacing: 0.5em;
+}
+
+.zx-unit + .zx-unit {
+  margin-top: var(--s-6);
+}
+
+.zx-unit > h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--t-md);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.zx-unit > p {
+  margin: var(--s-1) 0 0;
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.6;
+}
+
+.zx-unit > ol {
+  margin: var(--s-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zx-row {
+  display: grid;
+  grid-template-areas:
+    'n t dots m'
+    '. d d d';
+  grid-template-columns: 2.1em auto minmax(var(--s-5), 1fr) auto;
+  align-items: baseline;
+  margin-inline: calc(-1 * var(--s-3));
+  padding: var(--s-3);
+  border-radius: var(--r-1);
+  color: var(--text);
+  text-decoration: none;
+  transition: background-color var(--dur-1);
+}
+
+.zx-row:hover {
+  background: var(--wash);
+}
+
+.zx-row::after {
+  content: '';
+  grid-area: dots;
+  margin-inline: var(--s-3);
+  border-bottom: 1px dotted var(--rule-strong);
+  translate: 0 -0.3em;
+}
+
+.zx-row-n {
+  grid-area: n;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.zx-row-t {
+  grid-area: t;
+  color: var(--ink);
+  font-size: var(--t-md);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.zx-row.is-next > .zx-row-t {
+  color: var(--accent);
+}
+
+.zx-row-m {
+  grid-area: m;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+  white-space: nowrap;
+}
+
+/* 摘要最多两行：手机上一行只放得下十几个字，一句话要两行才说得完；更长的在第二行末尾收成省略号 */
+.zx-row-d {
+  display: -webkit-box;
+  grid-area: d;
+  margin-top: var(--s-1);
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.6;
+  text-wrap: pretty;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* —— 错题回顾 —— */
+.zx-review {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zx-review a {
+  display: block;
+  padding: var(--s-3) 0;
+  border-top: 1px solid var(--rule);
+  color: var(--ink);
+  line-height: 1.6;
+  text-decoration: none;
+}
+
+.zx-review a:hover {
+  color: var(--accent);
+}
+
+.zx-review a > span {
+  display: block;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+}
+
+/* —— 术语表 —— */
+.zx-glossary {
+  margin: 0;
+  column-gap: var(--s-6);
+  columns: 2 14em;
+}
+
+.zx-glossary > div {
+  padding: var(--s-2) 0;
+  border-top: 1px solid var(--rule);
+  break-inside: avoid;
+}
+
+.zx-glossary dt {
+  font-weight: 700;
+}
+
+.zx-glossary dt > a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.zx-glossary dt > a:hover {
+  color: var(--accent);
+}
+
+.zx-glossary dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--t-sm);
+  line-height: 1.65;
+}
+
+.zx-colophon {
+  margin: var(--s-8) 0 0;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-sm);
+}
+
+@media (min-width: 1000px) {
+  .zx-spread {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 0;
+    padding-block: 0;
+  }
+
+  .zx-cover {
+    position: sticky;
+    top: var(--header-h);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: start;
+    justify-content: center;
+    min-height: calc(100dvh - var(--header-h));
+    padding: var(--s-7) var(--s-7) var(--s-7) 0;
+  }
+
+  .zx-contents {
+    padding: var(--s-8) 0 var(--s-7) var(--s-7);
+    border-left: 1px solid var(--rule);
+  }
+}
+
+/* 知序 · 浮层：搜索、设置、笔记、目录抽屉、图片放大
+ * 全部是原生 dialog：焦点约束、Esc 关闭、背景失活都由浏览器负责。 */
+
+.zx-dialog {
+  --away: 0 var(--s-2); /* 进场从哪儿来、退场往哪儿去：居中的浮层从下面一点升上来 */
+  width: min(560px, calc(100vw - 2 * var(--s-4)));
+  max-height: min(720px, calc(100dvh - 2 * var(--s-5)));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-2);
+  background: var(--raise);
+  box-shadow: 0 18px 60px var(--shade);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-md);
+}
+
+.zx-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  animation: zx-appear var(--dur-2) var(--ease);
+}
+
+/* 背后的遮罩只淡入，不跟着浮层挪。它是浮层的伪元素，会把浮层的 --away 继承过来，所以要写明“不挪”：
+ * 不然面板从一侧滑出来的那一小会儿，遮罩也从同一侧扫进来，另一侧没盖住，点上去关不掉面板。
+ * （基线里最旧的 Chromium 120 实测没有遮罩，别的照常：那时的 ::backdrop 不继承任何元素，读不到 --veil，
+ *   按发布说明要到 122 才改。颜色变量登记过类型，读不到时得到的是初始值“透明”，var() 的后备值也救不了） */
+.zx-dialog::backdrop {
+  --away: 0 0;
+  background: var(--veil);
+  animation: zx-appear var(--dur-2) var(--ease);
+}
+
+/* 进场：淡入，同时从 --away 那儿过来（没写 --away 的只淡入：术语和旁注的浮层） */
+@keyframes zx-appear {
+  from {
+    opacity: 0;
+    translate: var(--away, 0 0);
+  }
+}
+
+/* 退场：关掉以后，浮层还在最上层留一小会儿，照原路淡出去。
+ * 这要靠 overlay 这个能过渡的属性，眼下只有 Chromium 有；别的内核里浮层和以前一样直接消失。
+ * 正在退场的浮层不接鼠标：读者这时候点的是它后面的页面 */
+@supports (overlay: auto) {
+  .zx-dialog {
+    transition:
+      opacity var(--dur-1) var(--ease),
+      translate var(--dur-1) var(--ease),
+      overlay var(--dur-1) allow-discrete,
+      display var(--dur-1) allow-discrete;
+  }
+
+  .zx-dialog::backdrop {
+    transition:
+      opacity var(--dur-1) var(--ease),
+      overlay var(--dur-1) allow-discrete,
+      display var(--dur-1) allow-discrete;
+  }
+
+  .zx-dialog:not([open]) {
+    opacity: 0;
+    translate: var(--away);
+    pointer-events: none;
+  }
+
+  .zx-dialog:not([open])::backdrop {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.zx-dialog-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-2) var(--s-2) var(--s-2) var(--s-5);
+  border-bottom: 1px solid var(--rule);
+}
+
+.zx-dialog-head > h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-lg);
+  font-weight: 700;
+}
+
+.zx-dialog-body {
+  padding: var(--s-5);
+  overflow-y: auto;
+}
+
+/* —— 搜索 —— */
+.zx-dialog--search {
+  margin-top: 12vh;
+}
+
+.zx-search-box {
+  display: flex;
+  flex: none;
+  gap: var(--s-3);
+  align-items: center;
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+}
+
+.zx-search-box > input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--ui-lg);
+}
+
+.zx-results {
+  margin: 0;
+  padding: var(--s-2);
+  overflow-y: auto;
+  list-style: none;
+}
+
+.zx-result {
+  display: block;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-1);
+  color: var(--muted);
+  font-size: var(--ui-sm);
+  text-decoration: none;
+}
+
+.zx-result:hover,
+.zx-result[aria-selected='true'] {
+  background: var(--accent-wash);
+}
+
+.zx-result > b {
+  display: block;
+  color: var(--ink);
+  font-size: var(--ui-md);
+}
+
+.zx-result > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zx-result mark {
+  background: none;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.zx-search-note {
+  margin: 0;
+  padding: var(--s-6) var(--s-5);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* —— 设置 —— */
+.zx-field {
+  margin: 0 0 var(--s-5);
+  padding: 0;
+  border: 0;
+}
+
+.zx-field > legend {
+  margin-bottom: var(--s-2);
+  padding: 0;
+  color: var(--muted);
+  font-size: var(--ui-sm);
+  font-weight: 700;
+}
+
+.zx-seg {
+  display: grid;
+  /* 每格至少放得下它的文字；一行放不下就折行，不把“跟随系统”拆成两行 */
+  grid-auto-columns: minmax(max-content, 1fr);
+  grid-auto-flow: column;
+  gap: var(--s-1);
+  padding: var(--s-1);
+  border-radius: var(--r-1);
+  background: var(--wash);
+}
+
+.zx-seg > label {
+  position: relative;
+  display: grid;
+  padding: var(--s-1) var(--s-2);
+  place-items: center;
+  border-radius: var(--r-0);
+  color: var(--muted);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.zx-seg input {
+  position: absolute;
+  opacity: 0;
+}
+
+.zx-seg > label:has(input:checked) {
+  background: var(--raise);
+  box-shadow: 0 1px 3px var(--shade);
+  color: var(--ink);
+}
+
+.zx-seg > label:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.zx-size {
+  display: flex;
+  gap: var(--s-3);
+  align-items: center;
+}
+
+.zx-size > input {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.zx-size > output {
+  min-width: 3.5em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.zx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  align-items: center;
+}
+
+.zx-status {
+  flex-basis: 100%;
+  min-height: 1.6em;
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--ui-sm);
+}
+
+.zx-keys {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-2) var(--s-4);
+  margin: 0;
+}
+
+.zx-keys dd {
+  margin: 0;
+  color: var(--muted);
+}
+
+.zx-keys kbd {
+  padding: 0 var(--s-1);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-1);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--ui-xs);
+}
+
+/* —— 两侧滑出的面板：左为目录，右为笔记 —— */
+.zx-dialog--drawer {
+  --away: -100% 0;
+  width: min(320px, 86vw);
+  height: 100dvh;
+  max-height: none;
+  margin: 0 auto 0 0;
+  border-width: 0 1px 0 0;
+  border-radius: 0 var(--r-2) var(--r-2) 0;
+}
+
+.zx-dialog--sheet {
+  --away: 100% 0;
+  width: min(440px, 100vw);
+  height: 100dvh;
+  max-height: none;
+  margin: 0 0 0 auto;
+  border-width: 0 0 0 1px;
+  border-radius: var(--r-2) 0 0 var(--r-2);
+}
+
+.zx-notes {
+  flex: 1;
+  min-height: 12em;
+  padding: var(--s-4) var(--s-5);
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-read);
+  font-weight: var(--w-body);
+  font-size: var(--ui-lg);
+  line-height: 1.8;
+  resize: none;
+}
+
+.zx-dialog-foot {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-3) var(--s-5);
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--ui-sm);
+}
+
+.zx-dialog-foot > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-left: auto;
+}
+
+/* —— 笔记停靠 ——
+ * 宽屏上笔记不是模态浮层：它占住正文右边的页边和页边以外的空地，正文栏不动，可以边读边写。
+ * .zx-dock 是正文网格里绝对定位的子元素，它的包含块正好是网格的第 3、4 两栏；面板在里面粘在页眉下方。
+ * “停靠着”不另记状态：面板开着、又不是模态的，就是停靠着。 */
+.zx-dock {
+  display: contents;
+}
+
+@media (min-width: 1280px) {
+  .zx-dock:has(> dialog[open]:not(:modal)) {
+    position: absolute;
+    display: block;
+    grid-column: 3 / -1;
+    inset: 0;
+    padding-left: var(--s-4);
+    pointer-events: none;
+  }
+
+  /* 停靠的面板就在版面里，不是从屏幕外滑进来的：只淡入；关掉时立刻让出页边，不留着淡出 */
+  .zx-dock > .zx-dialog {
+    --away: 0 0;
+    transition: none;
+  }
+
+  .zx-dock > dialog[open]:not(:modal) {
+    position: sticky;
+    top: var(--header-h);
+    width: auto;
+    max-width: 440px;
+    height: calc(100dvh - var(--header-h));
+    border-radius: 0;
+    box-shadow: none;
+    pointer-events: auto;
+  }
+}
+
+/* 模态浮层开着的时候，后面的页面不跟着滚动。
+ * 滚动条连同平时给它留的位置一起收起来：那一条不归页面，遮罩盖不到它，留着就是窗口右边一道没变暗的亮边。
+ * 让出来的宽度垫回去（--scrollbar，dialogs.js 在打开的时候量的），页眉、进度线和正文都不横移 */
+html:has(dialog:modal) {
+  overflow: hidden;
+  scrollbar-gutter: auto;
+}
+
+html:has(dialog:modal) body {
+  padding-right: var(--scrollbar);
+}
+
+html:has(dialog:modal) :is(.zx-header, .zx-progress) {
+  right: var(--scrollbar);
+}
+
+/* —— 图片放大 —— */
+.zx-dialog--lightbox {
+  width: fit-content;
+  max-width: min(1200px, calc(100vw - 2 * var(--s-5)));
+  max-height: calc(100dvh - 2 * var(--s-5));
+  padding: var(--s-5);
+  background: var(--paper);
+  cursor: zoom-out;
+}
+
+.zx-dialog--lightbox > figure {
+  margin: 0;
+  overflow: auto;
+  text-align: center;
+}
+
+/* 放大就是看原始大小，不硬拉。窄屏上原图比浮层宽，就在浮层里拖着看 */
+.zx-dialog--lightbox svg,
+.zx-dialog--lightbox img {
+  max-width: none;
+  height: auto;
+}
+
+@media (min-width: 700px) {
+  .zx-dialog--lightbox svg,
+  .zx-dialog--lightbox img {
+    max-width: 100%;
+    max-height: calc(100dvh - 190px);
+  }
+}
+
+.zx-dialog--lightbox figcaption {
+  margin-top: var(--s-3);
+  color: var(--muted);
+  font-family: var(--font-read);
+  font-weight: var(--w-body);
+  font-size: var(--ui-md);
+}
+
+/* 知序 · 打印与减弱动效
+ * 只有这个文件允许使用 !important：打印必须压过屏幕上的任何状态。 */
+
+/* 页眉印课程名和这一讲的名字，页脚印页码。它们写在页边框里：眼下只有 Chromium 认得，别的内核照旧不印。
+ * 文字由 main.js 放在根元素的两个变量里；颜色和字体写在 @page 上，页边框会继承。第一页有讲头，不再印页眉 */
+@page {
+  margin: 18mm 16mm 20mm;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-xs);
+
+  @top-left {
+    content: var(--print-course);
+  }
+
+  @top-right {
+    content: var(--print-lesson);
+  }
+
+  @bottom-center {
+    content: counter(page) ' / ' counter(pages);
+  }
+}
+
+@page :first {
+  @top-left {
+    content: none;
+  }
+
+  @top-right {
+    content: none;
+  }
+}
+
+@media print {
+  html {
+    --read: 14.5px !important;
+    background: none !important; /* 纸本身就是白的，不要再铺一层底色 */
+  }
+
+  /* 屏幕上 body 的内边距都是为屏幕留的：上面让出页眉；模态浮层开着时右边垫回滚动条的宽度（overlays.css）。
+     打印稿两样都不要：搜索、设置或笔记开着的时候打印，版面和平时一样 */
+  html.zx-js body {
+    display: block !important;
+    padding: 0 !important;
+  }
+
+  .zx-header,
+  .zx-progress,
+  .zx-side,
+  .zx-skip,
+  .zx-foot,
+  .zx-resume,
+  .zx-copy,
+  .zx-zoom-btn,
+  .zx-anchor,
+  main audio,
+  main video,
+  .zx-quiz-bar,
+  .zx-stepper-bar,
+  .zx-tablist,
+  .zx-ref,
+  .zx-cover-go,
+  .zx-dialog,
+  .zx-pop,
+  .quiz > .hint,
+  .quiz > .explain {
+    display: none !important;
+  }
+
+  /* 填空题：答题栏不进打印稿，留一条横线给读者写答案 */
+  .quiz[data-kind='fill']::after {
+    content: '';
+    display: block;
+    width: 14em;
+    height: 2.2em;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  html.zx-js main {
+    display: block !important;
+    padding: 0 !important;
+  }
+
+  main a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  main a[href^='http://']::after,
+  main a[href^='https://']::after {
+    content: '（' attr(href) '）';
+    color: var(--muted);
+    font-size: var(--em-sm);
+    overflow-wrap: anywhere;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  summary {
+    break-after: avoid;
+  }
+
+  figure,
+  table,
+  blockquote,
+  .callout,
+  .example,
+  .quiz,
+  .recap,
+  .cards > div,
+  .steps > li,
+  .timeline > li {
+    break-inside: avoid;
+  }
+
+  h2[data-num]::before {
+    position: static !important;
+    margin-right: 0.6em !important;
+  }
+
+  /* 讲次的大数字要有页边才挂得住：印出来还是“第 4 讲”那几个字 */
+  h1[data-num]::before {
+    display: none !important;
+  }
+
+  .zx-kicker-n {
+    display: inline !important;
+  }
+
+  /* 浏览器默认不印底色：屏幕上靠淡底色分出来的块，印出来改用细线框 */
+  main pre,
+  .recap,
+  .cards > div,
+  .flow > li {
+    border: 1px solid var(--rule-strong);
+    background: none !important;
+  }
+
+  main pre {
+    overflow: visible !important;
+    white-space: pre-wrap;
+  }
+
+  .zx-lines {
+    min-width: 0 !important;
+  }
+
+  .zx-table,
+  div.zx-math {
+    overflow: visible !important;
+  }
+
+  /* 旁注回到行内括注：浮层和页边的样子都撤掉 */
+  .zx-note {
+    position: static !important;
+    display: inline !important;
+    float: none !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    color: var(--muted) !important;
+    font-size: var(--t-xs) !important;
+  }
+
+  /* 纸上没有页边：伸进页边的宽内容收回来 */
+  .zx-wide {
+    margin-right: 0 !important;
+  }
+
+  .zx-note::before {
+    content: '（注：' !important;
+    margin: 0 !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    font-weight: 400 !important;
+  }
+
+  .zx-note::after {
+    content: '）';
+  }
+
+  /* 演示的每一帧、选项卡的每一页都摊开 */
+  .stepper[data-step] {
+    display: block !important;
+  }
+
+  .stepper[data-step] > figure {
+    margin-bottom: var(--s-3) !important;
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--rule);
+    visibility: visible !important;
+  }
+
+  .stepper figcaption {
+    min-height: 0 !important;
+  }
+
+  .stepper::before {
+    break-after: avoid;
+  }
+
+  .zx-tabs > [data-tab] {
+    display: block !important;
+    margin-bottom: var(--s-3);
+  }
+
+  .zx-tabs > [data-tab]::before {
+    content: attr(data-tab);
+    display: block;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--ui-md);
+    font-weight: 700;
+  }
+
+  /* 小测只留题面，答案集中附在讲末 */
+  .zx-opt {
+    padding: 0.1em 0 !important;
+    background: none !important;
+  }
+
+  .zx-opt::after,
+  .zx-fill {
+    display: none !important;
+  }
+
+  .zx-answers {
+    display: block !important;
+    break-before: page;
+  }
+
+  .zx-box {
+    print-color-adjust: exact;
+  }
+
+  /* 浏览器默认不印底色。靠底色表达的东西换一种画法：焦点格改成粗框深字，标亮改成下划线 */
+  .cells > .hit {
+    border-width: 2px !important;
+    background: none !important;
+    color: var(--ink) !important;
+  }
+
+  main mark {
+    background: none !important;
+    text-decoration: underline 2px var(--mark-ink) !important;
+    text-underline-offset: 0.2em !important;
+  }
+
+  /* 首页：封面在上，目录在下 */
+  .zx-spread {
+    display: block !important;
+  }
+
+  .zx-cover {
+    position: static !important;
+    min-height: 0 !important;
+    padding: 0 0 var(--s-6) !important;
+  }
+
+  .zx-contents {
+    padding: 0 !important;
+    border: 0 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  *::backdrop {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+}

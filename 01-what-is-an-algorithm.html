@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>算法是什么</title>
+<meta name="description" content="把“找最大值”的直觉拆成输入、处理与输出，写成可以检查的算法。">
+<link rel="stylesheet" href="template/zhixu.css">
+<script src="template/zhixu.js"></script>
+</head>
+<body>
+<main>
+<h1>算法，是把问题想清楚</h1>
+<p class="lead">桌上摊着八张卡片，每张写着一个数字。找出最大的那张，你大概几秒钟就能做到——可你能把这件事说得让任何人都照做、且结果一致吗？这一讲，我们就从这个动作开始，把“找最大值”变成一段可以检查的算法。</p>
+<ul class="goals">
+  <li>说清输入、处理与输出</li>
+  <li>把直觉拆成可执行的步骤</li>
+  <li>读懂第一段 Python 算法</li>
+  <li>用循环不变式解释它为什么对</li>
+</ul>
+
+<section id="algo-intuition">
+<h2>先从一个日常动作开始</h2>
+<p>假设桌上有八张卡片，数字依次是 8、3、12、5、9、2、16、7。你多半会先看第一张，把它记在心里；接着看第二张，比记住的数大就换掉它；一直看到最后一张，答案自然浮出来。</p>
+<p>这个过程里，你其实做了三件事：<strong>确认手里有什么</strong>、<strong>规定每一步怎么做</strong>、<strong>说清最后交付什么</strong>。日常的许多事情都是这个结构：在书架上找一本书、在词典里查一个词、按价格从低到高挑商品。<dfn data-def="一套明确、有限、能指向答案的步骤；不依赖某台机器，也不绑定某门语言。">算法</dfn>（algorithm）<span class="note">algorithm 一词源自 9 世纪波斯数学家花拉子米（al-Khwarizmi）名字的拉丁文译名 Algoritmi。他把印度—阿拉伯数字的运算方法系统化；后来这个词逐渐泛指一切明确的求解步骤。</span>不过是用更严格的语言，把这类过程完整地描述一遍。</p>
+<p><mark>把一个问题，变成一系列清晰、能看到终点的步骤</mark>——这是理解算法的起点，也是动手写程序之前该有的准备。</p>
+<div class="callout insight">
+  <p>算法的价值不在于“看起来聪明”，而在于“谁来做都一样”：同样的输入、照着同样的步骤，就一定得到同样的结果。这正是它能交给计算机执行，也能交给别人复核的原因。</p>
+</div>
+</section>
+
+<section id="algo-three-parts">
+<h2>输入、处理、输出</h2>
+<p>先别急着写代码。用三句话把这件事说清楚，一个算法就有了骨架。</p>
+<ol class="steps">
+  <li><h4>确定输入</h4><p>问题交给我什么？这里是一组数字，也就是八张卡片上的八个整数。输入决定了起点，也暗示了需要处理哪些情况。</p></li>
+  <li><h4>规定处理</h4><p>从第一个数开始，把它记作“当前最大”；之后每读一个数，就和“当前最大”比一次，更大就替换记录。</p></li>
+  <li><h4>交付输出</h4><p>所有数字都看过后，把记录下来的那个数交出去。按上面的规则，它一定是这组数里最大的。</p></li>
+</ol>
+<p>这里的三个词会反复出现：<strong>输入（input）</strong>、<strong>处理（process）</strong>、<strong>输出（output）</strong>。很多流程图，本质上只是把这三件事画了出来。一个问题，三段思考：</p>
+<ol class="flow">
+  <li>输入<small>八张写着数字的卡片</small></li>
+  <li>处理<small>逐张比较，更新记录</small></li>
+  <li>输出<small>这组数里的最大值</small></li>
+</ol>
+<p>算法做的事，就是把已知的信息，变成想要的答案。</p>
+</section>
+
+<section id="algo-steps-to-code">
+<h2>把步骤写成程序</h2>
+<p>把上面三步翻译成 Python，只要十来行。每一行都能对应回一个具体动作：记住、比较、更新、交出答案。代码下方的三条讲解，对应最值得记住的三行；没学过 Python 也没关系，先读讲解即可。</p>
+<pre data-lang="python" data-file="find_max.py" data-lines data-mark="2-3"><code>def find_max(numbers):
+    if not numbers:
+        raise ValueError("输入不能为空")
+
+    largest = numbers[0]
+    for number in numbers[1:]:  # 逐个看剩下的数
+        if number &gt; largest:
+            largest = number
+    return largest
+
+print(find_max([8, 3, 12, 5, 9, 2, 16, 7]))  # 16</code></pre>
+<ol class="code-notes">
+  <li data-line="5">先记住第一张：它是“已经看过”的数里最大的。</li>
+  <li data-line="7">只有更大的数，才值得更新记录。</li>
+  <li data-line="9">返回记录；遍历结束时，“已经看过”就是“全部”。</li>
+</ol>
+<p>标亮的第 2–3 行不是“找最大值”本身，而是给算法划定的适用范围；真正的主体从第 5 行开始。</p>
+<p>把这段代码存成 <code>find_max.py</code>，再运行 <code>python find_max.py</code>，屏幕上会打印出 16。</p>
+<details class="callout pitfall">
+  <summary>为什么第 2–3 行不是多余的检查？</summary>
+  <p>如果跳过空列表判断，<code>numbers[0]</code> 会抛出 <code>IndexError</code>：报错说的是“下标越界”，而不是真正的原因“输入为空”。换一种写法（比如先把记录设成 0）甚至不会报错，只是安静地返回一个错误答案，等它被带到很远的地方才暴露。</p>
+  <p>提前失败，是把边界条件写进接口约定：调用者明确知道空输入不被接受，而不是等错误自己浮出来。</p>
+</details>
+<div class="callout note">
+  <p>算法与程序不是一回事。算法是“步骤的思路”，可以用中文、流程图或代码表达；程序只是其中一种表达，还得符合某门语言的语法。同一种算法，可以写成不同语言、不同风格的许多程序。</p>
+</div>
+</section>
+
+<section id="algo-demo">
+<h2>让过程在眼前发生</h2>
+<blockquote>
+  <p>算法必须亲眼见过才可信；弄懂一个算法的最好办法，就是动手试一试。</p>
+  <cite>高德纳《计算机程序设计艺术》卷 1</cite>
+</blockquote>
+<p>点“下一步”，亲手把这套步骤走一遍。高亮的是正在查看的卡片，标着“最大”的是当前的记录，变暗的卡片已经比过，不可能再是答案。</p>
+<div class="stepper" data-title="找出最大的那张卡片">
+  <figure>
+    <div class="cells">
+      <span class="hit" data-label="最大">8</span><span class="on">3</span><span class="on">12</span><span class="on">5</span><span class="on">9</span><span class="on">2</span><span class="on">16</span><span class="on">7</span>
+    </div>
+    <figcaption>先记住第一张：8。还没有进行比较，从下一张开始。</figcaption>
+  </figure>
+  <figure>
+    <div class="cells">
+      <span class="on" data-label="最大">8</span><span class="hit" data-label="正在看">3</span><span class="on">12</span><span class="on">5</span><span class="on">9</span><span class="on">2</span><span class="on">16</span><span class="on">7</span>
+    </div>
+    <figcaption>第 1 次比较：查看 3，不比 8 大，保留最大值 8。</figcaption>
+  </figure>
+  <figure>
+    <div class="cells">
+      <span class="off">8</span><span class="off">3</span><span class="hit" data-label="最大">12</span><span class="on">5</span><span class="on">9</span><span class="on">2</span><span class="on">16</span><span class="on">7</span>
+    </div>
+    <figcaption>第 2 次比较：查看 12，比 8 大，最大值更新为 12。</figcaption>
+  </figure>
+  <figure>
+    <div class="cells">
+      <span class="off">8</span><span class="off">3</span><span class="on" data-label="最大">12</span><span class="hit" data-label="正在看">5</span><span class="on">9</span><span class="on">2</span><span class="on">16</span><span class="on">7</span>
+    </div>
+    <figcaption>第 3 次比较：查看 5，不比 12 大，保留最大值 12。</figcaption>
+  </figure>
+  <figure>
+    <div class="cells">
+      <span class="off">8</span><span class="off">3</span><span class="on" data-label="最大">12</span><span class="off">5</span><span class="hit" data-label="正在看">9</span><span class="on">2</span><span class="on">16</span><span class="on">7</span>
+    </div>
+    <figcaption>第 4 次比较：查看 9，不比 12 大，保留最大值 12。</figcaption>
+  </figure>
+  <figure>
+    <div class="cells">
+      <span class="off">8</span><span class="off">3</span><span class="on" data-label="最大">12</span><span class="off">5</span><span class="off">9</span><span class="hit" data-label="正在看">2</span><span class="on">16</span><span class="on">7</span>
+    </div>
+    <figcaption>第 5 次比较：查看 2，不比 12 大，保留最大值 12。</figcaption>
+  </figure>
+  <figure>
+    <div class="cells">
+      <span class="off">8</span><span class="off">3</span><span class="off">12</span><span class="off">5</span><span class="off">9</span><span class="off">2</span><span class="hit" data-label="最大">16</span><span class="on">7</span>
+    </div>
+    <figcaption>第 6 次比较：查看 16，比 12 大，最大值更新为 16。</figcaption>
+  </figure>
+  <figure>
+    <div class="cells">
+      <span class="off">8</span><span class="off">3</span><span class="off">12</span><span class="off">5</span><span class="off">9</span><span class="off">2</span><span class="on" data-label="最大">16</span><span class="hit" data-label="正在看">7</span>
+    </div>
+    <figcaption>第 7 次比较：查看 7，不比 16 大，保留最大值 16。全部看完：最大值是 16，共比较 7 次。</figcaption>
+  </figure>
+</div>
+<p>留意两件事。第一，最大值并不会每张都换，中间有几次只是看过就走。第二，<strong>没看过的卡片仍然可能更大</strong>：16 在第 6 次比较时就记下了，可要等看完最后一张 7，才能确定它就是答案。所以不能因为连续几次没更新就提前收工。</p>
+<p>为什么这个算法一定不会漏掉最大值？在循环的每一刻，都可以说出一句始终成立的话：“当前记录的，是我已经看过的所有数字中最大的。”开始时只看过第一张，这句话显然成立；每看一张，要么它不更大、记录不动，要么它更大、记录换成它，这句话依然成立。看完所有卡片时，“已经看过”就等于“全部”，记录自然就是全局最大值。</p>
+<p>这种在过程中一直成立的性质，叫作<dfn data-def="循环每一轮开始时都成立的性质；用它可以从“第一轮成立”一路推到“最后一轮成立”。">循环不变式</dfn>（loop invariant）。它比“试过几个例子都对了”更有说服力：它覆盖的是一类输入，而不是碰巧试过的那几个。</p>
+<p>在继续之前，用这张清单快速自查。</p>
+<ul class="tasks">
+  <li>看过找最大值的逐步演示，知道记录会在什么时候改变</li>
+  <li>在纸上重走一遍，写下每次比较后当前的最大值</li>
+  <li>用自己的话说清：为什么中途停下会漏掉答案</li>
+</ul>
+</section>
+
+<section id="algo-boundaries">
+<h2>边界，是算法的另一半</h2>
+<p>一组数字总有最大值吗？如果输入是空的——一张卡片也没有——“最大的那个”就不存在。这时算法应当明确地说“无法回答”，而不是随便返回一个数字让人误会<span class="note">不同语言与库的约定并不统一：Python 的 <code>max([])</code> 抛出异常，JavaScript 的 <code>Math.max()</code> 返回负无穷，SQL 的 <code>MAX</code> 对空表返回 <code>NULL</code>。选哪一种，取决于调用方更希望“立刻失败”，还是“继续处理”。</span>。<a href="#algo-steps-to-code"></a>那段代码的第 2–3 行，就是把这种情况挡在门外。</p>
+<div class="callout pitfall">
+  <p>边界条件不能靠“调用者应该不会传空”来维持。输入为空时，函数要么明确抛错，要么按约定返回一个可解释的结果；把规则写进接口，才算真正定义了算法。</p>
+</div>
+<p>再看另一种容易忽略的情形：若最大的数出现两次，比如 16 和 16，结果仍然是 16，没有问题；但若问题改成“最大的数在第几张卡片”，两个 16 就会给出两个不同的正确答案。可见<strong>问题的提法，决定了算法需要记住什么、返回什么</strong>。写代码之前把这句话想清楚，比事后补检查省力得多。</p>
+<div class="example" id="ex-tie" data-title="并列最大时，答案是哪一张">
+  <p>把问题改成“最大的数在第几张卡片”，算法要记住的就不再是数值，而是位置：</p>
+  <pre data-lang="python" data-file="find_max_position.py" data-lines data-mark="7"><code>def find_max_position(numbers):
+    if not numbers:
+        raise ValueError("输入不能为空")
+
+    position = 0
+    for i in range(1, len(numbers)):
+        if numbers[i] &gt; numbers[position]:
+            position = i
+    return position + 1  # 第几张：从 1 开始数</code></pre>
+  <p>四张卡片依次是 4、16、9、16，调用 <code>find_max_position([4, 16, 9, 16])</code> 会返回几？如果把第 7 行的 <code>&gt;</code> 换成 <code>&gt;=</code> 呢？</p>
+  <details class="answer">
+    <summary>解答</summary>
+    <p>返回 2。第二个 16 并不比第一个“更大”，记录停在最先出现的那一张。换成 <code>&gt;=</code> 之后，相等也会更新记录，返回 4，也就是最后出现的那一张。</p>
+    <p>两个答案都说得通，区别只在题目有没有讲清楚：并列时要第一张，还是最后一张。</p>
+  </details>
+</div>
+<p>还有一个小细节值得留意：输入里允许出现小数或负数吗？8、3、12 都是正整数，但算法本身并不依赖这一点，换成 −5 或 3.5 依然成立。真正依赖的只有一条：<em>这些数两两之间能比大小。</em></p>
+</section>
+
+<section id="algo-check">
+<h2>检查你的理解</h2>
+<p>先凭直觉选一个答案，再看解析。判断自己是否真的理解，标准是能不能说出“为什么”。</p>
+<div class="quiz" data-answer="b">
+  <p>按照这一讲的算法，8 张卡片一共要做几次大小比较？</p>
+  <ol>
+    <li>8 次，每张卡片都比一次</li>
+    <li>7 次，第一张用来设定起点</li>
+    <li>不确定，取决于最大值排在第几张</li>
+  </ol>
+  <p class="hint">回到演示数一数：第一张卡片有没有和谁比较？</p>
+  <div class="explain"><p>第一张用来设定记录，不算比较；剩下的 7 张各与当前最大值比较一次，因此 8 张卡片需要 7 次比较。一般地，<span class="math">n</span> 张卡片需要 <span class="math">n - 1</span> 次。</p></div>
+</div>
+<div class="quiz" data-answer="99|九十九|99次|九十九次">
+  <p>照同样的做法，100 张卡片需要比较多少次？</p>
+  <div class="explain"><p>第一张设定起点，其余 99 张各比较一次：<span class="math">100 - 1 = 99</span>。</p></div>
+</div>
+<div class="quiz">
+  <p>用自己的话解释：为什么“试了几组数据都对”还不足以说明算法正确？循环不变式补上了什么？</p>
+  <div class="explain"><p>试过的例子只覆盖有限的几种输入。循环不变式给出的是一句对任何输入都成立的话——“当前记录的，是已经看过的数里最大的”——它从第一轮一直保持到最后一轮，所以结论对所有输入成立。</p></div>
+</div>
+</section>
+
+<section class="recap">
+<h2>本讲小结</h2>
+<ul>
+  <li>算法是一套明确、有限、能到达终点的步骤，骨架是输入、处理与输出。</li>
+  <li>同一种算法可以用中文、流程图或程序表达；程序只是其中一种写法。</li>
+  <li>空输入、重复最大值这类边界情况，应当在步骤里就交代清楚。</li>
+  <li>循环不变式让我们证明算法对所有输入成立，而不只是对试过的例子成立。</li>
+</ul>
+<p>下一讲是<a href="02-binary-search.html"></a>：我们让卡片先排好队，看看“有序”这一个条件，能把找东西变快多少。</p>
+</section>
+</main>
+</body>
+</html>

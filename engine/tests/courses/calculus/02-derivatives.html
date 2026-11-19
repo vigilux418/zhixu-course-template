@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>导数</title>
+<meta name="description" content="导数是差商的极限，量的是函数在一点处的瞬时变化率。">
+<link rel="stylesheet" href="template/zhixu.css">
+<script src="template/zhixu.js"></script>
+</head>
+<body>
+<main>
+<h1>一瞬间的变化率</h1>
+<p class="lead">仪表盘上的车速，是“这一瞬间”的速度。可一瞬间既没有路程，也没有时间，速度从何谈起？答案是：取平均速度的极限。</p>
+<ul class="goals">
+  <li>把导数理解为差商的极限</li>
+  <li>从定义出发求简单函数的导数</li>
+  <li>使用求导法则与链式法则</li>
+</ul>
+
+<section id="derivative-definition">
+<h2>从割线到切线</h2>
+<p>在曲线 <span class="math">y = f(x)</span> 上取两点 <span class="math">(a, f(a))</span> 与 <span class="math">(a + h, f(a + h))</span>，过这两点的割线斜率叫<dfn data-def="函数值的增量与自变量增量之比，也就是割线的斜率。">差商</dfn>。让 <span class="math">h</span> 趋于 0，割线就转向切线（<a href="#fig-tangent"></a>）。差商的极限如果存在，就叫 <span class="math">f</span> 在 <span class="math">a</span> 处的<dfn data-def="差商在自变量增量趋于零时的极限，表示函数在一点处的瞬时变化率。">导数</dfn>：</p>
+<div class="math" id="eq-derivative">f'(a) = \lim_{h \to 0} \frac{f(a + h) - f(a)}{h}</div>
+<figure id="fig-tangent">
+  <svg viewBox="0 0 320 240" role="img" aria-label="抛物线 y = x² 上过点 (1, 1) 的割线与切线">
+    <line class="s-muted" x1="14" y1="200" x2="300" y2="200"/>
+    <line class="s-muted" x1="70" y1="228" x2="70" y2="10"/>
+    <path class="f-muted" d="M300 200 L292 196 L292 204 Z M70 10 L66 18 L74 18 Z"/>
+    <line class="s-line dash" x1="150" y1="160" x2="150" y2="200"/>
+    <line class="s-line dash" x1="230" y1="40" x2="230" y2="200"/>
+    <line class="s-mark dash" x1="118" y1="208" x2="242" y2="22"/>
+    <line class="s-mark w2" x1="94" y1="216" x2="262" y2="48"/>
+    <path class="s-accent w2" d="M22 185.6 L30 190 L38 193.6 L46 196.4 L54 198.4 L62 199.6 L70 200 L78 199.6 L86 198.4 L94 196.4 L102 193.6 L110 190 L118 185.6 L126 180.4 L134 174.4 L142 167.6 L150 160 L158 151.6 L166 142.4 L174 132.4 L182 121.6 L190 110 L198 97.6 L206 84.4 L214 70.4 L222 55.6 L230 40 L238 23.6 L246 6.4"/>
+    <circle class="f-accent" cx="150" cy="160" r="4.5"/>
+    <circle class="f-mark" cx="230" cy="40" r="4.5"/>
+    <text class="t-small" x="150" y="217" text-anchor="middle">1</text>
+    <text class="t-small" x="230" y="217" text-anchor="middle">1 + h</text>
+    <text class="t-small" x="296" y="217" text-anchor="end">x</text>
+    <text class="t-small" x="80" y="20">y</text>
+    <text class="t-small" x="160" y="178">(1, 1)</text>
+    <text class="t-small" x="220" y="42" text-anchor="end">割线</text>
+    <text class="t-small" x="268" y="62">切线</text>
+  </svg>
+  <figcaption>抛物线 <span class="math">y = x^2</span> 上，过 <span class="math">(1, 1)</span> 的割线随 <span class="math">h \to 0</span> 转向切线。</figcaption>
+</figure>
+<p>这里的“趋于”就是上一讲定义的极限（<a href="01-limits.html#eq-epsilon-delta"></a>）。导数除了记作 <span class="math">f'(x)</span>，也常写成 <span class="math">\dfrac{\mathrm{d}y}{\mathrm{d}x}</span><span class="note">前一种记号来自拉格朗日，后一种来自莱布尼茨：它提醒我们，导数是两个增量之比的极限。</span>。</p>
+<p>如果 <span class="math">s(t)</span> 表示时刻 <span class="math">t</span> 走过的路程，差商就是一段时间内的平均速度，导数 <span class="math">s'(t)</span> 就是瞬时速度。并非所有函数都处处可导：<span class="math">y = |x|</span> 在 <span class="math">x = 0</span> 处，差商的两个<dfn>单侧极限</dfn>分别是 <span class="math">-1</span> 和 <span class="math">1</span>，极限不存在，图像在那里是一个尖角。</p>
+<div class="example" id="ex-square">
+  <p>从定义出发，求 <span class="math">f(x) = x^2</span> 的导数。</p>
+  <details class="answer">
+    <summary>解答</summary>
+    <div class="math">
+      \begin{aligned}
+      f'(x) &amp;= \lim_{h \to 0} \frac{(x + h)^2 - x^2}{h} \\
+      &amp;= \lim_{h \to 0} \frac{2xh + h^2}{h} \\
+      &amp;= \lim_{h \to 0}\,(2x + h) = 2x.
+      \end{aligned}
+    </div>
+    <p>所以在 <span class="math">x = 1</span> 处，切线的斜率是 2，与<a href="#fig-tangent"></a>一致。</p>
+  </details>
+</div>
+</section>
+
+<section id="derivative-rules">
+<h2>求导法则</h2>
+<p>每次都回到定义太慢。常用函数的导数列在<a href="#tbl-rules"></a>里，可以直接使用。</p>
+<table id="tbl-rules">
+  <caption>基本初等函数的导数</caption>
+  <thead>
+    <tr><th><span class="math">f(x)</span></th><th><span class="math">f'(x)</span></th><th>说明</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><span class="math">c</span></td><td><span class="math">0</span></td><td>常数没有变化</td></tr>
+    <tr><td><span class="math">x^n</span></td><td><span class="math">n x^{n-1}</span></td><td>幂法则</td></tr>
+    <tr><td><span class="math">\sqrt{x}</span></td><td><span class="math">\dfrac{1}{2\sqrt{x}}</span></td><td>幂法则取 <span class="math">n = \frac{1}{2}</span></td></tr>
+    <tr><td><span class="math">\sin x</span></td><td><span class="math">\cos x</span></td><td>推导要用<a href="01-limits.html#eq-sinc"></a></td></tr>
+    <tr><td><span class="math">\cos x</span></td><td><span class="math">-\sin x</span></td><td>注意负号</td></tr>
+    <tr><td><span class="math">e^x</span></td><td><span class="math">e^x</span></td><td>对所有 <span class="math">x \in \mathbb{R}</span> 成立</td></tr>
+    <tr><td><span class="math">\ln x</span></td><td><span class="math">\dfrac{1}{x}</span></td><td>要求 <span class="math">x \gt 0</span></td></tr>
+  </tbody>
+</table>
+<p>函数经过四则运算与复合之后，导数按下面三条法则组合：</p>
+<div class="math" id="eq-product">(uv)' = u'v + uv'</div>
+<div class="math" id="eq-quotient">\left(\frac{u}{v}\right)' = \frac{u'v - uv'}{v^2}</div>
+<div class="math" id="eq-chain">\frac{\mathrm{d}y}{\mathrm{d}x} = \frac{\mathrm{d}y}{\mathrm{d}u} \cdot \frac{\mathrm{d}u}{\mathrm{d}x}</div>
+<p><a href="#eq-chain"></a>叫链式法则。例如 <span class="math">y = \sin(x^2)</span>，令 <span class="math">u = x^2</span>，就有 <span class="math">y' = \cos(x^2) \cdot 2x</span>。</p>
+<div class="callout insight">
+  <p>链式法则像一组咬合的齿轮：<span class="math">y</span> 相对 <span class="math">u</span> 的转速，乘以 <span class="math">u</span> 相对 <span class="math">x</span> 的转速，就是 <span class="math">y</span> 相对 <span class="math">x</span> 的转速。</p>
+</div>
+<div class="callout note" data-title="多元函数">
+  <p>自变量不止一个时，把每个分量对每个自变量的偏导数排成矩阵，就得到雅可比矩阵。对 <span class="math">F(x, y) = (x^2 y,\; x + y)</span>：</p>
+  <div class="math">
+    J =
+    \begin{pmatrix}
+    \dfrac{\partial F_1}{\partial x} &amp; \dfrac{\partial F_1}{\partial y} \\[1.5ex]
+    \dfrac{\partial F_2}{\partial x} &amp; \dfrac{\partial F_2}{\partial y}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+    2xy &amp; x^2 \\
+    1 &amp; 1
+    \end{pmatrix}
+  </div>
+</div>
+</section>
+
+<section id="derivative-check">
+<h2>练一练</h2>
+<div class="quiz" data-answer="12">
+  <p>设 <span class="math">f(x) = x^3</span>，求 <span class="math">f'(2)</span> 的值。</p>
+  <p class="hint">幂法则：<span class="math">(x^n)' = n x^{n-1}</span>。</p>
+  <div class="explain"><p><span class="math">f'(x) = 3x^2</span>，所以 <span class="math">f'(2) = 12</span>。</p></div>
+</div>
+<div class="quiz" data-answer="1">
+  <p>设 <span class="math">f(x) = x e^x</span>，求 <span class="math">f'(0)</span> 的值。</p>
+  <div class="explain"><p>由<a href="#eq-product"></a>，<span class="math">f'(x) = e^x + x e^x</span>，代入 <span class="math">x = 0</span> 得 1。</p></div>
+</div>
+<div class="quiz" data-answer="a,c">
+  <p>下面哪些等式成立？</p>
+  <ol>
+    <li><span class="math">(\sin 2x)' = 2\cos 2x</span></li>
+    <li><span class="math">(x \ln x)' = \ln x</span></li>
+    <li><span class="math">\left(\dfrac{1}{x}\right)' = -\dfrac{1}{x^2}</span></li>
+  </ol>
+  <div class="explain"><p>第二个漏了一项：由乘积法则，<span class="math">(x \ln x)' = \ln x + 1</span>。</p></div>
+</div>
+</section>
+
+<section class="recap">
+<h2>本讲小结</h2>
+<ul>
+  <li>导数是差商的极限，几何上是切线的斜率。</li>
+  <li>基本函数的导数查表，组合起来用乘积、商与链式法则。</li>
+  <li>求导把“变化”变成了可以计算的对象。</li>
+</ul>
+<p>把求导倒过来做，从变化率求总量，就是<a href="03-integrals.html"></a>的主题。</p>
+</section>
+</main>
+</body>
+</html>

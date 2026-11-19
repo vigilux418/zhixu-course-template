@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>积分</title>
+<meta name="description" content="定积分是黎曼和的极限；微积分基本定理把它变成求原函数。">
+<link rel="stylesheet" href="template/zhixu.css">
+<script src="template/zhixu.js"></script>
+</head>
+<body>
+<main>
+<h1>把无穷多个小块加起来</h1>
+<p class="lead">曲线下方的面积怎么算？把它切成许多细长的矩形，逐个相加；矩形越细，结果越准。让矩形的宽度趋于零，这个和的极限就是定积分。</p>
+<ul class="goals">
+  <li>把定积分理解为黎曼和的极限</li>
+  <li>用微积分基本定理计算定积分</li>
+  <li>看出求导与积分互为逆运算</li>
+</ul>
+
+<section id="integral-area">
+<h2>面积是和的极限</h2>
+<p>把区间 <span class="math">[a, b]</span> 等分成 <span class="math">n</span> 份，每份宽 <span class="math">\Delta x = \frac{b - a}{n}</span>；在第 <span class="math">i</span> 份上取一点 <span class="math">x_i</span>，用高为 <span class="math">f(x_i)</span> 的矩形近似这一小条的面积（<a href="#fig-riemann"></a>）。这些矩形面积的总和叫<dfn data-def="把区间分成小段，用每段上的函数值乘以段长再相加，得到的面积近似值。">黎曼和</dfn>。当 <span class="math">n \to \infty</span> 时，它的极限就是 <span class="math">f</span> 在 <span class="math">[a, b]</span> 上的<dfn data-def="黎曼和在分割无限加细时的极限，几何上是曲线下方的有向面积。">定积分</dfn>：</p>
+<div class="math" id="eq-riemann">\int_a^b f(x)\,\mathrm{d}x = \lim_{n \to \infty} \sum_{i=1}^{n} f(x_i)\,\Delta x</div>
+<figure id="fig-riemann">
+  <svg viewBox="0 0 320 240" role="img" aria-label="曲线 y = x² 在 0 到 1 之间，下方排着五个取右端点高度的矩形">
+    <line class="s-muted" x1="30" y1="200" x2="300" y2="200"/>
+    <line class="s-muted" x1="50" y1="222" x2="50" y2="10"/>
+    <path class="f-muted" d="M300 200 L292 196 L292 204 Z M50 10 L46 18 L54 18 Z"/>
+    <line class="s-line dash" x1="50" y1="40" x2="270" y2="40"/>
+    <rect class="f-mark-soft s-mark" x="50" y="193.6" width="44" height="6.4"/>
+    <rect class="f-mark-soft s-mark" x="94" y="174.4" width="44" height="25.6"/>
+    <rect class="f-mark-soft s-mark" x="138" y="142.4" width="44" height="57.6"/>
+    <rect class="f-mark-soft s-mark" x="182" y="97.6" width="44" height="102.4"/>
+    <rect class="f-mark-soft s-mark" x="226" y="40" width="44" height="160"/>
+    <path class="s-accent w2" d="M50 200 L58.8 199.7 L67.6 199 L76.4 197.7 L85.2 195.9 L94 193.6 L102.8 190.8 L111.6 187.5 L120.4 183.6 L129.2 179.3 L138 174.4 L146.8 169 L155.6 163.1 L164.4 156.7 L173.2 149.8 L182 142.4 L190.8 134.5 L199.6 126 L208.4 117.1 L217.2 107.6 L226 97.6 L234.8 87.1 L243.6 76.1 L252.4 64.6 L261.2 52.5 L270 40 L278.8 26.9 L287.6 13.4"/>
+    <text class="t-small" x="44" y="216" text-anchor="end">0</text>
+    <text class="t-small" x="270" y="216" text-anchor="middle">1</text>
+    <text class="t-small" x="44" y="44" text-anchor="end">1</text>
+    <text class="t-small" x="296" y="216" text-anchor="end">x</text>
+    <text class="t-small" x="60" y="20">y</text>
+  </svg>
+  <figcaption><span class="math">y = x^2</span> 在 <span class="math">[0, 1]</span> 上的黎曼和：<span class="math">n = 5</span>，取每一份的右端点。</figcaption>
+</figure>
+<p>积分号 <span class="math">\int</span> 是一个拉长的字母 S<span class="note">莱布尼茨取自拉丁文 summa（求和）的首字母。</span>，提醒我们积分本质上是求和；这里的极限仍按<a href="01-limits.html#limit-definition"></a>的方式理解。对 <span class="math">f(x) = x^2</span> 和区间 <span class="math">[0, 1]</span>，取右端点 <span class="math">x_i = \frac{i}{n}</span>：</p>
+<div class="math">
+  \begin{aligned}
+  \sum_{i=1}^{n} \left(\frac{i}{n}\right)^{2} \cdot \frac{1}{n}
+  &amp;= \frac{1}{n^3} \sum_{i=1}^{n} i^2
+  = \frac{1}{n^3} \cdot \frac{n(n + 1)(2n + 1)}{6} \\
+  &amp;= \frac{(n + 1)(2n + 1)}{6n^2} \;\longrightarrow\; \frac{1}{3} \quad (n \to \infty).
+  \end{aligned}
+</div>
+<p>改取每一份的左端点或中点，有限项的和会略有不同，但 <span class="math">n \to \infty</span> 时极限仍是 <span class="math">\frac{1}{3}</span>：极限与取点方式无关，正是“可积”的含义。</p>
+</section>
+
+<section id="integral-ftc">
+<h2>微积分基本定理</h2>
+<p>每次都算和的极限太辛苦。如果 <span class="math">F'(x) = f(x)</span>，就称 <span class="math">F</span> 是 <span class="math">f</span> 的一个<dfn data-def="导数等于给定函数的函数；同一个函数的任意两个原函数只相差一个常数。">原函数</dfn>。牛顿与莱布尼茨各自发现：</p>
+<div class="math" id="eq-ftc">\int_a^b f(x)\,\mathrm{d}x = F(b) - F(a)</div>
+<p>直观的理由是：把积分上限看作变量，面积随上限增长的速度，恰好是曲线在那一点的高度，</p>
+<div class="math" id="eq-area-rate">\frac{\mathrm{d}}{\mathrm{d}x} \int_a^x f(t)\,\mathrm{d}t = f(x)</div>
+<p>也就是说，面积函数本身就是 <span class="math">f</span> 的一个原函数。</p>
+<p><a href="#eq-ftc"></a>把求面积变成了求导的逆运算，于是<a href="02-derivatives.html#tbl-rules"></a>倒过来读，就是一张积分表。由 <span class="math">(x^3)' = 3x^2</span> 可知 <span class="math">\frac{x^3}{3}</span> 是 <span class="math">x^2</span> 的原函数，所以</p>
+<div class="math">\int_0^1 x^2\,\mathrm{d}x = \frac{x^3}{3}\,\Bigg|_0^1 = \frac{1}{3}</div>
+<p>与上一节用<a href="#eq-riemann"></a>算出的结果一致。把乘积法则（<a href="02-derivatives.html#eq-product"></a>）两边积分，还能得到分部积分公式：</p>
+<div class="math" id="eq-parts">\int u\,\mathrm{d}v = uv - \int v\,\mathrm{d}u</div>
+<div class="example" id="ex-sine">
+  <p>求 <span class="math">\displaystyle \int_0^{\pi} \sin x\,\mathrm{d}x</span>。</p>
+  <details class="answer">
+    <summary>解答</summary>
+    <p>因为 <span class="math">(-\cos x)' = \sin x</span>，由<a href="#eq-ftc"></a>：</p>
+    <div class="math">\int_0^{\pi} \sin x\,\mathrm{d}x = -\cos x\,\Big|_0^{\pi} = -\cos\pi + \cos 0 = 2</div>
+  </details>
+</div>
+<div class="callout exam">
+  <p>不定积分别忘了积分常数：<span class="math">\int 2x\,\mathrm{d}x = x^2 + C</span>。定积分里，常数在 <span class="math">F(b) - F(a)</span> 中相互抵消，可以不写。</p>
+</div>
+</section>
+
+<section id="integral-check">
+<h2>练一练</h2>
+<div class="quiz" data-answer="8">
+  <p>求 <span class="math">\displaystyle \int_0^2 3x^2\,\mathrm{d}x</span> 的值。</p>
+  <div class="explain"><p><span class="math">3x^2</span> 的一个原函数是 <span class="math">x^3</span>，所以结果是 <span class="math">2^3 - 0^3 = 8</span>。</p></div>
+</div>
+<div class="quiz" data-answer="1">
+  <p>求 <span class="math">\displaystyle \int_1^{e} \frac{1}{x}\,\mathrm{d}x</span> 的值。</p>
+  <p class="hint">想一想：谁的导数是 <span class="math">\frac{1}{x}</span>？</p>
+  <div class="explain"><p><span class="math">\ln x\,\Big|_1^{e} = \ln e - \ln 1 = 1</span>。</p></div>
+</div>
+<div class="quiz" data-answer="0.44|11/25">
+  <p><a href="#fig-riemann"></a>里五个矩形的面积之和是多少？请写成小数。</p>
+  <div class="explain"><p><span class="math">\frac{1}{5}\left(0.2^2 + 0.4^2 + 0.6^2 + 0.8^2 + 1^2\right) = 0.44</span>。它比精确值 <span class="math">\frac{1}{3}</span> 大，因为取右端点时矩形高出了曲线。</p></div>
+</div>
+</section>
+
+<section class="recap">
+<h2>本讲小结</h2>
+<ul>
+  <li>定积分是黎曼和的极限，几何上是曲线下方的面积。</li>
+  <li>微积分基本定理：定积分等于原函数在两个端点处的差。</li>
+  <li>求导与积分互为逆运算，求导法则倒过来就是积分法则。</li>
+</ul>
+<p>三讲连成一条线：<a href="01-limits.html"></a>提供语言，<a href="02-derivatives.html"></a>度量变化，这一讲完成累积。</p>
+</section>
+</main>
+</body>
+</html>

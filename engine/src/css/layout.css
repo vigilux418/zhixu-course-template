@@ -1,0 +1,485 @@
+/* 知序 · 版面骨架：页眉、目录栏、正文栏与页边 */
+
+/* 脚本接管期间先不显示，避免版面跳动；启动完成或失败时，加载器和运行时会去掉这个类。
+ * 用 display: none，不用 visibility: hidden：后者照样要排版。不是每个内核都会等脚本做完才排第一帧，
+ * 不等的那些会先给作者写的原样排一遍版，引擎改完再排一遍。页面不占版面，这头一遍就省掉了 */
+html.zx-js.zx-loading body {
+  display: none;
+}
+
+/* 翻页：旧页面留到新页面的第一帧，再交叉淡入 */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+html.zx-js body {
+  padding-top: var(--header-h);
+}
+
+.zx-skip {
+  position: fixed;
+  top: var(--s-2);
+  left: var(--s-2);
+  z-index: 40;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-1);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  text-decoration: none;
+  translate: 0 -300%;
+}
+
+.zx-skip:focus {
+  translate: 0;
+}
+
+/* “跳到正文”把焦点交给整块正文：这不是一个要让读者看见的控件，不画焦点框 */
+main:focus-visible,
+.zx-home:focus-visible {
+  outline: none;
+}
+
+.zx-alert {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: var(--s-3) var(--s-5);
+  border-bottom: 1px solid var(--bad);
+  background: var(--bad-wash);
+  color: var(--bad);
+  font-weight: 700;
+}
+
+/* —— 通用控件 —— */
+.zx-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.zx-tool {
+  position: relative;
+  display: grid;
+  flex: none;
+  width: var(--tool);
+  height: var(--tool);
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: var(--r-1);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-1),
+    color var(--dur-1);
+}
+
+.zx-tool:hover {
+  background: var(--wash);
+  color: var(--ink);
+}
+
+/* 手指点按：图标按钮看上去不变，能点到的范围扩到 44 像素；文字按钮直接加高 */
+@media (pointer: coarse) {
+  .zx-tool::after {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--s-1));
+  }
+
+  .zx-btn {
+    min-height: 44px;
+  }
+}
+
+.zx-btn {
+  display: inline-flex;
+  gap: var(--s-2);
+  align-items: center;
+  padding: var(--s-2) var(--s-4);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-1);
+  background: var(--raise);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--ui-md);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-1),
+    background-color var(--dur-1);
+}
+
+.zx-btn:hover:enabled {
+  border-color: var(--accent);
+}
+
+.zx-btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.zx-btn--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.zx-btn--primary:hover {
+  border-color: var(--accent-strong);
+  background: var(--accent-strong);
+}
+
+/* —— 页眉 —— */
+.zx-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  height: var(--header-h);
+  padding-inline: var(--s-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+  transition: translate var(--dur-2) var(--ease);
+}
+
+html.zx-away .zx-header:not(:focus-within) {
+  translate: 0 -100%;
+}
+
+.zx-brand {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  min-width: 0;
+  padding-inline: var(--s-1);
+  color: var(--ink);
+  font-size: var(--ui-md);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.zx-brand > svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--accent);
+}
+
+.zx-brand > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 书眉：读过标题之后，页眉中间显示当前讲与小节；点击回到顶部 */
+.zx-running {
+  flex: 1;
+  min-width: 0;
+  padding: var(--s-2);
+  overflow: hidden;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--ui-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden; /* 看不见的时候也不能被 Tab 选中 */
+  transition:
+    opacity var(--dur-2),
+    visibility var(--dur-2);
+}
+
+html.zx-past .zx-running {
+  opacity: 1;
+  visibility: visible;
+}
+
+.zx-tools {
+  display: flex;
+  flex: none;
+  gap: var(--s-1);
+  align-items: center;
+  margin-left: auto;
+}
+
+.zx-find > span,
+.zx-find > kbd,
+.zx-tool--wide {
+  display: none;
+}
+
+.zx-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 21;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: 0 0;
+  scale: 0 1; /* 读到哪儿，线就长到哪儿：shell.js 滚动时改这个值 */
+}
+
+/* —— 目录栏 —— */
+.zx-side {
+  display: none;
+}
+
+.zx-nav {
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+
+.zx-nav ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zx-nav-unit {
+  margin: var(--s-5) 0 var(--s-2);
+  padding-inline: var(--s-2);
+  color: var(--muted);
+  font-size: var(--ui-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.zx-nav-unit:first-child {
+  margin-top: 0;
+}
+
+.zx-nav-link {
+  display: grid;
+  grid-template-columns: 1.4em minmax(0, 1fr) auto;
+  gap: var(--s-1);
+  align-items: baseline;
+  padding: var(--s-2);
+  border-radius: var(--r-1);
+  color: var(--text);
+  font-size: var(--ui-md);
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.zx-nav-link:hover {
+  background: var(--wash);
+  color: var(--ink);
+}
+
+.zx-nav-n {
+  color: var(--muted);
+  font-size: var(--ui-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.zx-nav-link[aria-current='page'] {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* 读完的讲次带一枚小印 */
+.zx-nav-link.is-done::after,
+.zx-row.is-done > .zx-row-m::before {
+  content: '';
+  display: inline-block;
+  align-self: center;
+  width: 9px;
+  height: 9px;
+  margin-right: var(--s-1);
+  border-radius: var(--r-0);
+  background: var(--seal);
+  rotate: -8deg;
+  print-color-adjust: exact; /* 首页打印出来，读过的讲次照样带着小印 */
+}
+
+.zx-toc {
+  margin: var(--s-1) 0 var(--s-2) 1.25em;
+  border-left: 1px solid var(--rule);
+}
+
+.zx-toc a {
+  display: block;
+  margin-left: -1px;
+  padding: var(--s-1) var(--s-2) var(--s-1) calc(var(--s-4) - var(--bar));
+  border-left: var(--bar) solid transparent;
+  color: var(--muted);
+  font-size: var(--ui-sm);
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.zx-toc a:hover {
+  color: var(--ink);
+}
+
+.zx-toc a.is-active {
+  border-left-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* —— 正文栏 —— */
+html.zx-js main {
+  position: relative; /* 停靠的笔记面板按这个网格的栏来定位 */
+  display: grid;
+  grid-template-columns: minmax(var(--s-5), 1fr) minmax(0, var(--measure)) minmax(var(--s-5), 1fr);
+  padding-block: var(--s-5) var(--s-8); /* 手机上页眉下面少留一些：第一节的标题要落在第一屏里 */
+}
+
+html.zx-js main > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
+@media (min-width: 700px) {
+  html.zx-js main {
+    padding-top: var(--s-7);
+  }
+
+  .zx-find {
+    display: flex;
+    gap: var(--s-2);
+    width: auto;
+    min-width: 168px;
+    height: 34px;
+    align-items: center;
+    padding: 0 var(--s-2) 0 var(--s-3);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-1);
+    background: var(--wash);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: var(--ui-sm);
+  }
+
+  .zx-find > span {
+    display: inline;
+    flex: 1;
+    text-align: left;
+  }
+
+  .zx-find > kbd {
+    display: inline;
+    padding: 0 var(--s-1);
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--r-0);
+    background: var(--raise);
+    font-family: var(--font-mono);
+    font-size: var(--ui-xs);
+  }
+
+  .zx-tool--wide {
+    display: grid;
+  }
+}
+
+/* 宽屏：正文右侧留出页边，小节里普通段落的旁注一直排在里面；小节编号悬挂在左侧。
+ * 笔记停靠时页边归它，这些旁注和别处的一样收进浮层。“没有停靠着”这个条件用 :where() 包起来，不抬高选择器的优先级。 */
+@media (min-width: 1000px) {
+  html.zx-js main {
+    grid-template-columns:
+      minmax(var(--gutter), 1fr) minmax(0, var(--measure)) calc(var(--note-w) + var(--note-gap))
+      minmax(var(--s-5), 1fr);
+  }
+
+  h2[data-num] {
+    position: relative;
+  }
+
+  h2[data-num]::before {
+    position: absolute;
+    right: 100%;
+    margin-right: 0.5em;
+  }
+
+  /* 章首页：讲次是一个大号的数字，和小节编号一样悬挂在标题左侧，“第 4 讲”几个字让给它。
+   * 它排在标题第一行的行首，基线自然和标题对齐；宽度和负的外边距相抵，不占地方；行高是零，不撑高这一行 */
+  h1[data-num]::before {
+    content: attr(data-num);
+    display: inline-block;
+    width: 3em;
+    margin: 0 0.22em 0 -3.22em;
+    color: var(--muted);
+    font-size: var(--t-numeral);
+    font-weight: 400;
+    line-height: 0;
+    text-align: right;
+  }
+
+  .zx-kicker-n {
+    display: none;
+  }
+
+  :where(html:not(:has(.zx-dock > dialog[open]:not(:modal)))) .zx-note--margin:not(:popover-open) {
+    position: static;
+    display: block;
+    float: right;
+    clear: right;
+    width: var(--note-w);
+    max-width: none;
+    margin: 0.35em calc(-1 * (var(--note-w) + var(--note-gap))) var(--s-3) 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    color: var(--muted);
+    font-size: var(--t-xs);
+    line-height: 1.65;
+  }
+
+  :where(html:not(:has(.zx-dock > dialog[open]:not(:modal)))) .zx-note--margin:not(:popover-open)::before {
+    content: attr(data-n);
+    margin-right: 0.5em;
+    color: var(--accent);
+    font-family: var(--font-sans);
+    font-weight: 700;
+  }
+
+  /* 正文栏里放不下的表格、代码和图伸进页边（figures.js 量出来的）。旁边已经有旁注的话，排到旁注下面 */
+  :where(html:not(:has(.zx-dock > dialog[open]:not(:modal)))) .zx-wide {
+    clear: right;
+    margin-right: calc(-1 * (var(--note-w) + var(--note-gap)));
+  }
+
+  /* 鼠标移到序号上，或者键盘选中它：页边里对应的那条旁注变深 */
+  .zx-ref:is(:hover, :focus-within) + .zx-note--margin:not(:popover-open) {
+    color: var(--ink);
+  }
+}
+
+@media (min-width: 1280px) {
+  html[data-side='on'] body {
+    display: grid;
+    grid-template-columns: var(--side-w) minmax(0, 1fr);
+  }
+
+  html[data-side='on'] .zx-side {
+    position: sticky;
+    top: var(--header-h);
+    display: block;
+    height: calc(100dvh - var(--header-h));
+    padding: var(--s-5) var(--s-3) var(--s-7) var(--s-4);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-strong) transparent;
+  }
+}

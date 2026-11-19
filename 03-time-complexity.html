@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>时间复杂度</title>
+<meta name="description" content="把“耗时”换成操作次数的增长趋势，看方法在数据变大后能走多远。">
+<link rel="stylesheet" href="template/zhixu.css">
+<script src="template/zhixu.js"></script>
+</head>
+<body>
+<main>
+<h1>当问题变大，会发生什么</h1>
+<p class="lead">前一讲我们算过：二分查找最多 11 次，顺序查找最坏 1024 次。但“11 比 1024 小”只是对某一组数据成立的观察。如果数据变成 100 万条，这个比例会保持、缩小还是拉大？要回答这个问题，得换一把尺子。</p>
+<ul class="goals">
+  <li>区分实际耗时与增长趋势</li>
+  <li>读懂 O(1)、O(log n)、O(n)、O(n²)</li>
+  <li>用最坏情况比较两种查找</li>
+  <li>知道复杂度理论的来路</li>
+</ul>
+
+<section id="complexity-growth">
+<h2>先数操作，再看增长</h2>
+<p>上一讲比较了两种查找：顺序查找最坏要看遍每一个元素，<dfn>二分查找</dfn>每次砍掉一半。我们真正想知道的，是<strong>当问题规模继续变大，这种差距会缩小、维持，还是拉大</strong>。</p>
+<p>同一段程序，在老笔记本上跑 2 秒，在服务器上只要 0.2 秒；只盯着“秒”，很容易得出错误的结论。为了把“机器有多快”从讨论里拿掉，我们换一个计量单位：不数秒，数<dfn data-def="算法里反复执行、每次耗时大致固定的一步，例如比较两个数。">基本操作</dfn>执行了多少次。找最大值时，基本操作是“比较两个数”，<span class="math">n</span> 个数需要比较 <span class="math">n - 1</span> 次；二分查找里，基本操作是“比较一次中点”，每比一次，候选范围就减半。机器快慢只会改变每秒能做多少次操作，不会改变<em>操作次数随规模增长的方式</em>——而后者，恰恰决定了数据变大之后这个方法还能不能用。</p>
+<p><mark>重要的不只是现在有多快，还有规模翻十倍之后，还站不站得住。</mark><dfn data-def="算法的基本操作次数随问题规模增长的方式，通常用大 O 记号表示。">时间复杂度</dfn>讨论的正是这件事。</p>
+<div class="callout insight">
+  <p>把“几秒”换成“几次操作”，是为了剔除机器差异，只留下可以推理、可以互相比较的部分。这也解释了为什么两台性能悬殊的电脑上，比较两个算法的结论常常一致。</p>
+</div>
+</section>
+
+<section id="complexity-curves">
+<h2>把三种增长画在同一张图上</h2>
+<p>横轴是问题规模 <span class="math">n</span>，纵轴是基本操作次数。把常见的几种增长叠在一起，差别立刻显形。</p>
+<figure id="fig-growth">
+  <svg viewBox="0 0 660 320" role="img" aria-label="三条画在同一把尺子上的增长曲线，横轴和纵轴都从 0 到 20：平方增长在 n 不到 5 时就超出了画面，线性增长是一条斜线，对数增长到 n 等于 20 时才略高于 4">
+    <text class="t-small" x="16" y="158" text-anchor="middle" transform="rotate(-90 16 158)">基本操作次数</text>
+    <text class="t-small" x="650" y="308" text-anchor="end">问题规模 n</text>
+    <path class="s-muted" d="M82 44V264H654"/>
+    <text class="t-small" x="224" y="284" text-anchor="middle">5</text>
+    <text class="t-small" x="70" y="215" text-anchor="end">5</text>
+    <text class="t-small" x="366" y="284" text-anchor="middle">10</text>
+    <text class="t-small" x="70" y="162" text-anchor="end">10</text>
+    <text class="t-small" x="508" y="284" text-anchor="middle">15</text>
+    <text class="t-small" x="70" y="109" text-anchor="end">15</text>
+    <text class="t-small" x="650" y="284" text-anchor="middle">20</text>
+    <text class="t-small" x="70" y="56" text-anchor="end">20</text>
+    <text class="t-small" x="70" y="284" text-anchor="end">0</text>
+    <path class="s-muted" d="M224 264v5M82 211h-5M366 264v5M82 158h-5M508 264v5M82 105h-5M650 264v5M82 52h-5"/>
+    <path class="s-line dash" d="M650 218.2V52"/>
+    <path class="s-mark w2" d="M82 264 L89.1 263.3 L96.2 261.4 L103.3 258 L110.4 253.4 L117.5 247.4 L124.6 240.2 L131.7 231.5 L138.8 221.6 L145.9 210.3 L153 197.8 L160.1 183.8 L167.2 168.6 L174.3 152 L181.4 134.2 L188.5 114.9 L195.6 94.4 L202.7 72.5 L209 52"/>
+    <path class="s-muted w2" d="M82 264 L650 52"/>
+    <path class="s-accent w2" d="M110.4 264 L124.6 257.8 L138.8 253.4 L153 250 L167.2 247.2 L181.4 244.8 L195.6 242.8 L209.8 241 L224 239.4 L238.2 237.9 L252.4 236.6 L266.6 235.4 L280.8 234.2 L295 233.2 L309.2 232.2 L323.4 231.3 L337.6 230.4 L351.8 229.6 L366 228.8 L380.2 228 L394.4 227.3 L408.6 226.7 L422.8 226 L437 225.4 L451.2 224.8 L465.4 224.2 L479.6 223.6 L493.8 223.1 L508 222.6 L522.2 222.1 L536.4 221.6 L550.6 221.1 L564.8 220.7 L579 220.2 L593.2 219.8 L607.4 219.4 L621.6 219 L635.8 218.6 L650 218.2"/>
+    <circle class="f-muted" cx="650" cy="52" r="4.5"/>
+    <circle class="f-accent" cx="650" cy="218.2" r="4.5"/>
+    <text class="t-small" x="221" y="68">n²，平方增长</text>
+    <text class="t-small" x="452" y="96" text-anchor="end">n，线性增长</text>
+    <text class="t-small" x="636" y="202.2" text-anchor="end">log n，对数增长</text>
+  </svg>
+  <figcaption>三种增长画在同一把尺子上：横轴和纵轴都是 0 到 20。<span class="math">n^2</span> 在 <span class="math">n</span> 不到 5 时就冲出了画面；<span class="math">n</span> 是一条斜线；<span class="math">\log_2 n</span> 到 <span class="math">n = 20</span> 时才刚过 4。右端的两个圆点，是同一规模下线性与对数的差距。</figcaption>
+</figure>
+<p>读<a href="#fig-growth"></a>时记住三件事：<strong>曲线的高低不代表绝对耗时</strong>，它只描述增长方式；<strong>起点附近的差距说明不了什么</strong>，规模很小时，系数和低阶项的影响很大；<strong>规模越大，曲线之间张得越开</strong>。当 <span class="math">n = 1000</span> 时，<span class="math">\log_2 n</span> 约为 10，<span class="math">n</span> 是 1000，<span class="math">n^2</span> 已达 1,000,000——同一台机器上，这三者已经不是“快一点”和“慢一点”的关系。</p>
+<blockquote>
+  <p>花哨的算法在 n 很小时很慢，而 n 通常很小。</p>
+  <cite>Rob Pike，《Notes on Programming in C》，1989</cite>
+</blockquote>
+<p>这句来自工程师的提醒，说的正是第二件事：规模很小时，系数和低阶项说了算；只有规模大起来，增长趋势才接管一切。</p>
+</section>
+
+<section id="complexity-big-o">
+<h2>用大 O 记下增长</h2>
+<p>把上面的观察写成一个记号，就是<dfn data-def="用规模 n 的增长趋势描述效率的记号：写作 O(…)，省略系数与低阶项。">大 O 记号</dfn>（Big-O notation）<span class="note">这个记号最早由德国数学家巴赫曼（Paul Bachmann）在 1894 年引入，后来经朗道（Edmund Landau）推广开来；高德纳又把它带进算法分析，成为今天的通用写法。</span>。它描述的是规模 <span class="math">n</span> 趋于很大时，操作次数增长的上界。写法上有个约定：省略系数和低阶项，只留下增长最快的那一项。</p>
+<div class="math" id="eq-drop">3n + 5 = O(n), \qquad 2n^2 + 5n + 8 = O(n^2)</div>
+<p><span class="math">n</span> 足够大时，低阶项占的份量越来越小，可以略去；系数不会变小，略去它，是因为它不改变增长的方式。</p>
+<p>为什么可以像<a href="#eq-drop"></a>这样省？因为大 O 追问的是“<span class="math">n</span> 变大以后谁说了算”。<span class="math">3n + 5</span> 里，<span class="math">n</span> 增大十倍，总次数也大致增大十倍；系数 3 让直线更陡，常数项 5 把它整体上移，但都不会改变它是一条直线。而 <span class="math">2n^2 + 5n + 8</span> 里，平方项会迅速压过其余部分，决定形状的是 <span class="math">n^2</span>。</p>
+<h3>四种常见的“长相”</h3>
+<p>先认一认四种最常见的增长：</p>
+<div class="cards">
+  <div><h4>常数时间</h4><p><span class="math">O(1)</span>：一步到位。规模怎么变，操作次数都不变。</p></div>
+  <div><h4>对数时间</h4><p><span class="math">O(\log n)</span>：每轮砍掉一半。范围缩得飞快，曲线几乎是平的。</p></div>
+  <div><h4>线性时间</h4><p><span class="math">O(n)</span>：逐个查看。规模翻倍，工作量也翻倍。</p></div>
+  <div><h4>平方时间</h4><p><span class="math">O(n^2)</span>：两两组合。规模翻倍，工作量涨到四倍。</p></div>
+</div>
+<p>只记形状容易混，换成具体数字就直观了。同样处理 1000 个元素，结果列在<a href="#tbl-thousand"></a>里。</p>
+<table id="tbl-thousand">
+  <caption>1000 个元素时，四种复杂度大约要做多少次基本操作</caption>
+  <thead>
+    <tr><th>复杂度</th><th class="num"><span class="math">n = 1000</span> 时</th><th>本课程里的例子</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><span class="math">O(1)</span></td><td class="num">1 次</td><td>按下标直接读取数组中的元素</td></tr>
+    <tr><td><span class="math">O(\log n)</span></td><td class="num">约 10 次</td><td>有序数组的二分查找</td></tr>
+    <tr><td><span class="math">O(n)</span></td><td class="num">1000 次</td><td>扫描数组找最大值</td></tr>
+    <tr><td><span class="math">O(n^2)</span></td><td class="num">1,000,000 次</td><td>两两比较所有数对</td></tr>
+  </tbody>
+</table>
+<div class="callout exam">
+  <p>写复杂度有两个动作不能省：<strong>先说清分析的是最好、平均还是最坏情况</strong>，<strong>再省略系数与低阶项</strong>。顺序查找最坏是 <span class="math">O(n)</span>；“目标恰好在第一个”只是最好情况，不能拿它当一般结论。</p>
+</div>
+<h3>动手数一次</h3>
+<p><a href="#tbl-thousand"></a>最后一行的“两两比较所有数对”，可以用一段很短的程序来体会：检查一组数里有没有重复。</p>
+<div class="example" id="ex-count-pairs" data-title="数一数两层循环">
+  <pre data-lang="python" data-file="has_duplicate.py" data-lines><code>def has_duplicate(numbers):
+    n = len(numbers)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if numbers[i] == numbers[j]:
+                return True
+    return False</code></pre>
+  <p>把第 5 行的比较当作基本操作。最坏情况下（没有任何重复），<span class="math">n</span> 个数一共要比较多少次？时间复杂度是多少？</p>
+  <details class="answer">
+    <summary>解答</summary>
+    <p>第一个数要和后面的 <span class="math">n - 1</span> 个数各比一次，第二个数比 <span class="math">n - 2</span> 次……最后一个数不用再比。加起来是</p>
+    <div class="math" id="eq-pairs">(n - 1) + (n - 2) + \cdots + 1 = \frac{n(n - 1)}{2}</div>
+    <p>展开得 <span class="math">\frac{1}{2}n^2 - \frac{1}{2}n</span>，省略系数与低阶项，时间复杂度是 <span class="math">O(n^2)</span>。<span class="math">n = 1000</span> 时，<a href="#eq-pairs"></a>给出 499,500 次，与表中的一百万次是同一个量级。</p>
+  </details>
+</div>
+</section>
+
+<section id="complexity-compare">
+<h2>两种查找，差别有多大</h2>
+<p>把两种查找放进同一个问题里：数组有 <span class="math">n</span> 个元素且已经有序，比较最坏情况下的工作量。二分查找的次数来自上一讲的<a href="02-binary-search.html#eq-binary-worst"></a>，推导见<a href="02-binary-search.html#binary-example"></a>。</p>
+<div class="cards">
+  <div>
+    <h4>顺序查找</h4>
+    <ul>
+      <li>从第一个元素开始逐个比较</li>
+      <li>最坏要看完全部 <span class="math">n</span> 个元素</li>
+      <li>时间复杂度 <span class="math">O(n)</span></li>
+      <li>对数据顺序没有要求</li>
+      <li>1,000,000 个元素最坏 1,000,000 次比较</li>
+    </ul>
+  </div>
+  <div>
+    <h4>二分查找</h4>
+    <ul>
+      <li>每次比较后丢掉一半候选</li>
+      <li>最坏比较 <span class="math">\lfloor \log_2 n \rfloor + 1</span> 次</li>
+      <li>时间复杂度 <span class="math">O(\log n)</span></li>
+      <li>要求数据事先有序</li>
+      <li>1,000,000 个元素最坏 20 次比较</li>
+    </ul>
+  </div>
+</div>
+<p>20 与 1,000,000 相差五万倍。查一次，一百万次比较对今天的计算机也只是一眨眼；可同样的查找如果每秒要做上万次，差距就从“察觉不到”变成“等不起”。规模再涨十倍，顺序查找要多做十倍的工作，二分查找只多比较三四次。</p>
+<div class="callout pitfall">
+  <p>别只算查找那一步。原始数据若无序，为了用二分查找先排序，排序本身通常要 <span class="math">O(n \log n)</span>。只查一两次的话，准备成本可能高过直接顺序查找；只有当同一份有序数据要被反复查询，提前排序才真正划算。</p>
+</div>
+<p>数据库的“索引”就是这笔账的工业版本。建索引相当于提前把数据按某一列排好序：要花时间，也占空间；换来的是此后每一次按这一列查询，都不必再逐行扫描。</p>
+<pre data-lang="sql"><code>-- 没有索引：逐行扫描整张表，O(n)
+SELECT name FROM students WHERE student_no = 20231;
+
+-- 建立索引：数据库维护一份按 student_no 排序的结构
+CREATE INDEX idx_student_no ON students (student_no);
+
+-- 同一条查询，现在约 O(log n)
+SELECT name FROM students WHERE student_no = 20231;</code></pre>
+<p>在 SQLite 里给查询加上 <code>EXPLAIN QUERY PLAN</code>，可以看到执行方式从 <code>SCAN</code>（逐行扫描）变成了 <code>SEARCH … USING INDEX</code>（按索引查找）。</p>
+</section>
+
+<section id="complexity-history">
+<h2>这条路是怎么走过来的</h2>
+<p>把“效率”当成可以量化的学问，并不是一开始就有的想法。它经历了从“能不能算出来”到“要算多久”的转变，下面几个节点大致标出了这条路。</p>
+<ol class="timeline">
+  <li><time>1936</time> <strong>图灵：先问“能不能算”。</strong>图灵用图灵机刻画“可计算”的含义。一个问题先要存在算法解，才谈得上快慢；这是后来复杂度理论的起点。</li>
+  <li><time>1965</time> <strong>埃德蒙兹：多项式时间算“有效”。</strong>Jack Edmonds 在研究图的匹配问题时提出，把“存在多项式时间的算法”作为问题算得上有效可解的判据。此后 P 类问题有了明确的直觉含义。</li>
+  <li><time>1971</time> <strong>库克：第一个 NP 完全问题。</strong>Stephen Cook 证明布尔可满足性问题（SAT）属于 NP，且所有 NP 问题都能在多项式时间内归约到它。从此“看起来难”有了严格的说法。</li>
+  <li><time>1972</time> <strong>卡普：21 个 NP 完全问题。</strong>Richard Karp 用归约把 NP 完全性扩展到 21 个实际问题，从图着色到背包。人们这才发现，难解问题不是零星特例，而是一大片<span class="note">P 是否等于 NP，至今仍无定论。它是克雷数学研究所七道“千禧年大奖难题”之一，悬赏一百万美元；如果某个 NP 完全问题被找到多项式时间算法，P 与 NP 就会相等。</span>。</li>
+</ol>
+<p>这些年份不需要背下来，它们留下的是两个习惯：拿到一个问题，先看它的工作量随规模怎样增长；再确认自己面对的是“相对容易”的一类，还是“公认困难”的一类，好决定是求精确解，还是接受一个够用的近似。</p>
+</section>
+
+<section id="complexity-check">
+<h2>检查你的理解</h2>
+<p>用几道题检验刚才的三个结论：数操作、认增长、说清前提。</p>
+<div class="quiz" data-answer="c">
+  <p>某算法在最坏情况下要做 <span class="math">2n^2 + 5n + 8</span> 次基本操作，最贴近其增长阶的写法是？</p>
+  <ol>
+    <li><span class="math">O(1)</span></li>
+    <li><span class="math">O(n)</span></li>
+    <li><span class="math">O(n^2)</span></li>
+  </ol>
+  <div class="explain"><p><span class="math">n</span> 足够大时，<span class="math">2n^2</span> 这一项主导增长，<span class="math">5n</span> 与常数项 8 都可以略去，因此常用写法是 <span class="math">O(n^2)</span>。注意前提：这里说的是最坏情况下的增长阶。</p></div>
+</div>
+<div class="quiz" data-answer="4|四|4倍|四倍">
+  <p>一个 <span class="math">O(n^2)</span> 的算法，数据量从 1000 增加到 2000，工作量大约变成原来的几倍？</p>
+  <p class="hint">把 <span class="math">n</span> 换成 <span class="math">2n</span>，看看 <span class="math">n^2</span> 变成了什么。</p>
+  <div class="explain"><p><span class="math">(2n)^2 = 4n^2</span>：规模翻倍，工作量变成四倍。</p></div>
+</div>
+<div class="quiz" data-answer="b,d">
+  <p>下面哪些说法是正确的？</p>
+  <ol>
+    <li>复杂度更低的算法，在任何规模下都更快</li>
+    <li>大 O 记号省略系数与低阶项</li>
+    <li>顺序查找的时间复杂度是 <span class="math">O(1)</span>，因为目标可能恰好在第一个</li>
+    <li>数据量足够大时，对数增长的算法终将比线性增长的算法做更少的操作</li>
+  </ol>
+  <p class="hint">留意“任何规模”“可能恰好”这类字眼：它们说的是哪一种情况？</p>
+  <div class="explain"><p>第二、四项正确。第一项错在“任何规模”：规模很小时，系数更小的算法可能反而更快。第三项把最好情况当成了一般结论，顺序查找最坏要看完全部元素，是 <span class="math">O(n)</span>。</p></div>
+</div>
+</section>
+
+<section class="recap">
+<h2>本讲小结</h2>
+<ul>
+  <li>用基本操作次数代替秒数，才能把机器差异从讨论里去掉。</li>
+  <li>大 O 记录增长趋势：省略系数与低阶项，但要先说明最好、平均还是最坏情况。</li>
+  <li><span class="math">\log n</span>、<span class="math">n</span>、<span class="math">n^2</span> 在规模小时差距有限，规模一大就判若云泥。</li>
+  <li>复杂度低不等于一定更快：准备数据的代价、被大 O 略去的系数，同样算成本。</li>
+</ul>
+<p>最后一讲（<a href="04-recursion.html"></a>）换一个方向：不再问“多快”，而是问“能不能把一个大问题，换成更小的同类问题”，让它借助更小的自己得到答案。</p>
+</section>
+</main>
+</body>
+</html>

@@ -1,0 +1,422 @@
+/* 知序 · 浮层：搜索、设置、笔记、目录抽屉、图片放大
+ * 全部是原生 dialog：焦点约束、Esc 关闭、背景失活都由浏览器负责。 */
+
+.zx-dialog {
+  --away: 0 var(--s-2); /* 进场从哪儿来、退场往哪儿去：居中的浮层从下面一点升上来 */
+  width: min(560px, calc(100vw - 2 * var(--s-4)));
+  max-height: min(720px, calc(100dvh - 2 * var(--s-5)));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-2);
+  background: var(--raise);
+  box-shadow: 0 18px 60px var(--shade);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--ui-md);
+}
+
+.zx-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  animation: zx-appear var(--dur-2) var(--ease);
+}
+
+/* 背后的遮罩只淡入，不跟着浮层挪。它是浮层的伪元素，会把浮层的 --away 继承过来，所以要写明“不挪”：
+ * 不然面板从一侧滑出来的那一小会儿，遮罩也从同一侧扫进来，另一侧没盖住，点上去关不掉面板。
+ * （基线里最旧的 Chromium 120 实测没有遮罩，别的照常：那时的 ::backdrop 不继承任何元素，读不到 --veil，
+ *   按发布说明要到 122 才改。颜色变量登记过类型，读不到时得到的是初始值“透明”，var() 的后备值也救不了） */
+.zx-dialog::backdrop {
+  --away: 0 0;
+  background: var(--veil);
+  animation: zx-appear var(--dur-2) var(--ease);
+}
+
+/* 进场：淡入，同时从 --away 那儿过来（没写 --away 的只淡入：术语和旁注的浮层） */
+@keyframes zx-appear {
+  from {
+    opacity: 0;
+    translate: var(--away, 0 0);
+  }
+}
+
+/* 退场：关掉以后，浮层还在最上层留一小会儿，照原路淡出去。
+ * 这要靠 overlay 这个能过渡的属性，眼下只有 Chromium 有；别的内核里浮层和以前一样直接消失。
+ * 正在退场的浮层不接鼠标：读者这时候点的是它后面的页面 */
+@supports (overlay: auto) {
+  .zx-dialog {
+    transition:
+      opacity var(--dur-1) var(--ease),
+      translate var(--dur-1) var(--ease),
+      overlay var(--dur-1) allow-discrete,
+      display var(--dur-1) allow-discrete;
+  }
+
+  .zx-dialog::backdrop {
+    transition:
+      opacity var(--dur-1) var(--ease),
+      overlay var(--dur-1) allow-discrete,
+      display var(--dur-1) allow-discrete;
+  }
+
+  .zx-dialog:not([open]) {
+    opacity: 0;
+    translate: var(--away);
+    pointer-events: none;
+  }
+
+  .zx-dialog:not([open])::backdrop {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.zx-dialog-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-2) var(--s-2) var(--s-2) var(--s-5);
+  border-bottom: 1px solid var(--rule);
+}
+
+.zx-dialog-head > h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--ui-lg);
+  font-weight: 700;
+}
+
+.zx-dialog-body {
+  padding: var(--s-5);
+  overflow-y: auto;
+}
+
+/* —— 搜索 —— */
+.zx-dialog--search {
+  margin-top: 12vh;
+}
+
+.zx-search-box {
+  display: flex;
+  flex: none;
+  gap: var(--s-3);
+  align-items: center;
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+}
+
+.zx-search-box > input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--ui-lg);
+}
+
+.zx-results {
+  margin: 0;
+  padding: var(--s-2);
+  overflow-y: auto;
+  list-style: none;
+}
+
+.zx-result {
+  display: block;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-1);
+  color: var(--muted);
+  font-size: var(--ui-sm);
+  text-decoration: none;
+}
+
+.zx-result:hover,
+.zx-result[aria-selected='true'] {
+  background: var(--accent-wash);
+}
+
+.zx-result > b {
+  display: block;
+  color: var(--ink);
+  font-size: var(--ui-md);
+}
+
+.zx-result > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zx-result mark {
+  background: none;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.zx-search-note {
+  margin: 0;
+  padding: var(--s-6) var(--s-5);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* —— 设置 —— */
+.zx-field {
+  margin: 0 0 var(--s-5);
+  padding: 0;
+  border: 0;
+}
+
+.zx-field > legend {
+  margin-bottom: var(--s-2);
+  padding: 0;
+  color: var(--muted);
+  font-size: var(--ui-sm);
+  font-weight: 700;
+}
+
+.zx-seg {
+  display: grid;
+  /* 每格至少放得下它的文字；一行放不下就折行，不把“跟随系统”拆成两行 */
+  grid-auto-columns: minmax(max-content, 1fr);
+  grid-auto-flow: column;
+  gap: var(--s-1);
+  padding: var(--s-1);
+  border-radius: var(--r-1);
+  background: var(--wash);
+}
+
+.zx-seg > label {
+  position: relative;
+  display: grid;
+  padding: var(--s-1) var(--s-2);
+  place-items: center;
+  border-radius: var(--r-0);
+  color: var(--muted);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.zx-seg input {
+  position: absolute;
+  opacity: 0;
+}
+
+.zx-seg > label:has(input:checked) {
+  background: var(--raise);
+  box-shadow: 0 1px 3px var(--shade);
+  color: var(--ink);
+}
+
+.zx-seg > label:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.zx-size {
+  display: flex;
+  gap: var(--s-3);
+  align-items: center;
+}
+
+.zx-size > input {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.zx-size > output {
+  min-width: 3.5em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.zx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  align-items: center;
+}
+
+.zx-status {
+  flex-basis: 100%;
+  min-height: 1.6em;
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--ui-sm);
+}
+
+.zx-keys {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-2) var(--s-4);
+  margin: 0;
+}
+
+.zx-keys dd {
+  margin: 0;
+  color: var(--muted);
+}
+
+.zx-keys kbd {
+  padding: 0 var(--s-1);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-1);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--ui-xs);
+}
+
+/* —— 两侧滑出的面板：左为目录，右为笔记 —— */
+.zx-dialog--drawer {
+  --away: -100% 0;
+  width: min(320px, 86vw);
+  height: 100dvh;
+  max-height: none;
+  margin: 0 auto 0 0;
+  border-width: 0 1px 0 0;
+  border-radius: 0 var(--r-2) var(--r-2) 0;
+}
+
+.zx-dialog--sheet {
+  --away: 100% 0;
+  width: min(440px, 100vw);
+  height: 100dvh;
+  max-height: none;
+  margin: 0 0 0 auto;
+  border-width: 0 0 0 1px;
+  border-radius: var(--r-2) 0 0 var(--r-2);
+}
+
+.zx-notes {
+  flex: 1;
+  min-height: 12em;
+  padding: var(--s-4) var(--s-5);
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-read);
+  font-weight: var(--w-body);
+  font-size: var(--ui-lg);
+  line-height: 1.8;
+  resize: none;
+}
+
+.zx-dialog-foot {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-3) var(--s-5);
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--ui-sm);
+}
+
+.zx-dialog-foot > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-left: auto;
+}
+
+/* —— 笔记停靠 ——
+ * 宽屏上笔记不是模态浮层：它占住正文右边的页边和页边以外的空地，正文栏不动，可以边读边写。
+ * .zx-dock 是正文网格里绝对定位的子元素，它的包含块正好是网格的第 3、4 两栏；面板在里面粘在页眉下方。
+ * “停靠着”不另记状态：面板开着、又不是模态的，就是停靠着。 */
+.zx-dock {
+  display: contents;
+}
+
+@media (min-width: 1280px) {
+  .zx-dock:has(> dialog[open]:not(:modal)) {
+    position: absolute;
+    display: block;
+    grid-column: 3 / -1;
+    inset: 0;
+    padding-left: var(--s-4);
+    pointer-events: none;
+  }
+
+  /* 停靠的面板就在版面里，不是从屏幕外滑进来的：只淡入；关掉时立刻让出页边，不留着淡出 */
+  .zx-dock > .zx-dialog {
+    --away: 0 0;
+    transition: none;
+  }
+
+  .zx-dock > dialog[open]:not(:modal) {
+    position: sticky;
+    top: var(--header-h);
+    width: auto;
+    max-width: 440px;
+    height: calc(100dvh - var(--header-h));
+    border-radius: 0;
+    box-shadow: none;
+    pointer-events: auto;
+  }
+}
+
+/* 模态浮层开着的时候，后面的页面不跟着滚动。
+ * 滚动条连同平时给它留的位置一起收起来：那一条不归页面，遮罩盖不到它，留着就是窗口右边一道没变暗的亮边。
+ * 让出来的宽度垫回去（--scrollbar，dialogs.js 在打开的时候量的），页眉、进度线和正文都不横移 */
+html:has(dialog:modal) {
+  overflow: hidden;
+  scrollbar-gutter: auto;
+}
+
+html:has(dialog:modal) body {
+  padding-right: var(--scrollbar);
+}
+
+html:has(dialog:modal) :is(.zx-header, .zx-progress) {
+  right: var(--scrollbar);
+}
+
+/* —— 图片放大 —— */
+.zx-dialog--lightbox {
+  width: fit-content;
+  max-width: min(1200px, calc(100vw - 2 * var(--s-5)));
+  max-height: calc(100dvh - 2 * var(--s-5));
+  padding: var(--s-5);
+  background: var(--paper);
+  cursor: zoom-out;
+}
+
+.zx-dialog--lightbox > figure {
+  margin: 0;
+  overflow: auto;
+  text-align: center;
+}
+
+/* 放大就是看原始大小，不硬拉。窄屏上原图比浮层宽，就在浮层里拖着看 */
+.zx-dialog--lightbox svg,
+.zx-dialog--lightbox img {
+  max-width: none;
+  height: auto;
+}
+
+@media (min-width: 700px) {
+  .zx-dialog--lightbox svg,
+  .zx-dialog--lightbox img {
+    max-width: 100%;
+    max-height: calc(100dvh - 190px);
+  }
+}
+
+.zx-dialog--lightbox figcaption {
+  margin-top: var(--s-3);
+  color: var(--muted);
+  font-family: var(--font-read);
+  font-weight: var(--w-body);
+  font-size: var(--ui-md);
+}

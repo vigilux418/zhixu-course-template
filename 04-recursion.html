@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>递归的思维</title>
+<meta name="description" content="先解决一个更小的自己，再把答案接回来：写出一定能停下的递归。">
+<link rel="stylesheet" href="template/zhixu.css">
+<script src="template/zhixu.js"></script>
+</head>
+<body>
+<main>
+<h1>用更小的问题，回答大问题</h1>
+<p class="lead">前两讲里，我们都在追问“怎样更快”。这一讲换个角度：怎样把一个暂时不会做的大问题，换成一个更小、但同样类型的问题？递归（recursion）把这种拆解直接写进代码，也把“边界”这件事摆到了最显眼的位置。</p>
+<ul class="goals">
+  <li>识别“长得一样”的子问题</li>
+  <li>写出一定能停下来的递归</li>
+  <li>看懂调用栈的展开与返回</li>
+  <li>分清递归的代价与适用场景</li>
+</ul>
+
+<section id="recursion-same">
+<h2>让问题保留原来的模样</h2>
+<p>非负整数 <span class="math">n</span> 的阶乘，记作 <span class="math">n!</span>。<span class="math">n</span> 不小于 1 时，它是从 1 乘到 <span class="math">n</span> 的连乘；0 没有什么可乘的，约定 <span class="math">0! = 1</span>。举个例子：<span class="math">5! = 5 \times 4 \times 3 \times 2 \times 1 = 120</span>。这个连乘有个容易被忽略的性质——去掉开头的 5，剩下的 <span class="math">4 \times 3 \times 2 \times 1</span> 恰好就是 <span class="math">4!</span>。</p>
+<div class="math" id="eq-factorial">n! = n \times (n - 1)!</div>
+<p>想求 <span class="math">n</span> 的阶乘，先求 <span class="math">n - 1</span> 的阶乘，再乘上 <span class="math">n</span>。问题变小了，形状却没变。</p>
+<p>沿着<a href="#eq-factorial"></a>一路走下去：<span class="math">5!</span> 需要 <span class="math">4!</span>，<span class="math">4!</span> 需要 <span class="math">3!</span>，<span class="math">3!</span> 需要 <span class="math">2!</span>，<span class="math">2!</span> 需要 <span class="math">1!</span>。到 <span class="math">1!</span> 时不必再拆，因为 <span class="math">1! = 1</span> 是已知的（<span class="math">0! = 1</span> 同样是约定好的）。这个“不用再拆”的地方，就是<dfn data-def="把问题换成同类型的更小问题，再用子问题的答案拼出当前答案。">递归</dfn>（recursion）的<dfn data-def="递归中不必再拆、可以直接给出答案的情况，英文叫 base case。">终止条件</dfn>（base case）。</p>
+<p>换个角度看：递归把一条长长的连乘，拆成一串“我做一小步，剩下的交给下一层”的接力。每一层只负责自己那次乘法，其余的相信下一层会给出答案。</p>
+<ol class="flow">
+  <li>原问题<small>求 3 的阶乘</small></li>
+  <li>子问题<small>先求 2 的阶乘</small></li>
+  <li>组合<small>3 乘以子问题的答案</small></li>
+</ol>
+<p>把答案一层层接回来的前提是：每一层都比上一层更靠近终点，递归才停得下来。</p>
+</section>
+
+<section id="recursion-two-keys">
+<h2>递归的两个关键</h2>
+<p>写递归时，只要先回答两个问题，代码的骨架就出来了。</p>
+<dl>
+  <dt>什么时候不再拆？</dt><dd>终止条件：<span class="math">n</span> 为 0 或 1 时直接返回 1。没有它，递归会一直往下调用，直到程序崩溃。</dd>
+  <dt>怎么让问题变小？</dt><dd>递归步骤：把 <span class="math">n!</span> 写成 <span class="math">n</span> 乘以 <span class="math">(n - 1)!</span>，每次调用都让参数减一，稳定地靠近终止条件。</dd>
+</dl>
+<p>把两个回答合在一起，就是阶乘的完整定义：</p>
+<div class="math">
+  n! =
+  \begin{cases}
+  1, &amp; n \le 1 \\
+  n \times (n - 1)!, &amp; n \gt 1
+  \end{cases}
+</div>
+<div class="callout memory">
+  <p>一句话记住递归的两半：<strong>一个缩小的动作，一条守得住的边界。</strong>只有动作没有边界，会停不下来；只有边界没有动作，问题永远原地打转。</p>
+</div>
+<p>两者还要配合：边界给出终点，缩小的动作保证每一层都在朝终点迈进。判断一段递归写得对不对，先看这两件事，通常比从头读一遍代码更快。</p>
+</section>
+
+<section id="recursion-code">
+<h2>写成函数，只有几行</h2>
+<p>把上面两句话翻译成代码。注意它同时包含“向下调用”和“向上返回”：必须先拿到 <code>factorial(n - 1)</code> 的结果，当前这一层的乘法才能完成。下面同样是 Python 与 JavaScript 两版，逻辑一字不差。</p>
+<div class="tabs">
+  <div data-tab="Python">
+    <pre data-lang="python" data-file="factorial.py" data-lines><code>def factorial(n):
+    if n &lt;= 1:
+        return 1
+    return n * factorial(n - 1)
+
+print(factorial(5))  # 120
+print(factorial(0))  # 1</code></pre>
+    <ol class="code-notes">
+      <li data-line="3">终止条件：命中边界就直接返回，不再向下调用。</li>
+      <li data-line="4">递归步骤：先让下一层算出 <span class="math">(n - 1)!</span>，再乘上 <span class="math">n</span>。</li>
+    </ol>
+  </div>
+  <div data-tab="JavaScript">
+    <pre data-lang="javascript" data-file="factorial.js" data-lines><code>function factorial(n) {
+  if (n &lt;= 1) {
+    return 1;
+  }
+  return n * factorial(n - 1);
+}
+
+console.log(factorial(5)); // 120
+console.log(factorial(0)); // 1</code></pre>
+    <ol class="code-notes">
+      <li data-line="3">终止条件：命中边界就直接返回。</li>
+      <li data-line="5">递归步骤：调用参数小一号的自己。</li>
+    </ol>
+  </div>
+</div>
+<p>为了看清结构，两版都省略了类型检查；实际使用时，应当先确认 <span class="math">n</span> 是非负整数。</p>
+<p>代码里最容易被误读的是 <code>factorial(n - 1)</code> 这一句：它不是“稍后再算”，而是真的暂停当前这一层、进入下一层，直到最底层交回一个具体的数，才开始一层层往回乘。</p>
+</section>
+
+<section id="recursion-stack">
+<h2>沿着调用，再走回来</h2>
+<p>以 <code>factorial(3)</code> 为例，把整个往返过程画出来，会清楚很多。</p>
+<figure id="fig-call-stack">
+  <svg viewBox="0 0 660 292" role="img" aria-label="factorial(3) 的调用栈：三层依次向下调用到 factorial(1) 这个边界，再逐层返回 1、2、6">
+    <text class="t-title" x="30" y="34">向下调用：层层等待</text>
+    <text class="t-title" x="380" y="34">向上返回：层层相乘</text>
+    <rect class="f-card s-muted" x="30" y="50" width="260" height="58" rx="12"/>
+    <text class="t-title" x="160" y="76" text-anchor="middle">factorial(3)</text>
+    <text class="t-small" x="160" y="96" text-anchor="middle">等待 factorial(2) 的结果</text>
+    <path class="f-ink" d="M156 110 L164 110 L160 130 Z"/>
+    <rect class="f-card s-muted" x="30" y="132" width="260" height="58" rx="12"/>
+    <text class="t-title" x="160" y="158" text-anchor="middle">factorial(2)</text>
+    <text class="t-small" x="160" y="178" text-anchor="middle">等待 factorial(1) 的结果</text>
+    <path class="f-ink" d="M156 192 L164 192 L160 212 Z"/>
+    <rect class="f-mark-soft s-mark w2" x="30" y="214" width="260" height="58" rx="12"/>
+    <text class="t-title" x="160" y="240" text-anchor="middle">factorial(1)</text>
+    <text class="t-small" x="160" y="260" text-anchor="middle">命中边界，直接返回 1</text>
+    <path class="s-muted" d="M294 243 L362 243"/>
+    <path class="f-ink" d="M360 239 L376 243 L360 247 Z"/>
+    <rect class="f-card s-muted" x="380" y="214" width="250" height="58" rx="12"/>
+    <text class="t-title" x="505" y="240" text-anchor="middle">返回 1</text>
+    <text class="t-small" x="505" y="260" text-anchor="middle">边界给出答案</text>
+    <path class="f-ink" d="M501 208 L509 208 L505 192 Z"/>
+    <rect class="f-card s-muted" x="380" y="132" width="250" height="58" rx="12"/>
+    <text class="t-title" x="505" y="158" text-anchor="middle">2 × 1 = 2</text>
+    <text class="t-small" x="505" y="178" text-anchor="middle">交回上一层</text>
+    <path class="f-ink" d="M501 126 L509 126 L505 110 Z"/>
+    <rect class="f-accent-soft s-accent w2" x="380" y="50" width="250" height="58" rx="12"/>
+    <text class="t-title" x="505" y="76" text-anchor="middle">3 × 2 = 6</text>
+    <text class="t-small" x="505" y="96" text-anchor="middle">最终答案</text>
+  </svg>
+  <figcaption>递归的两个阶段：向下调用时每一层都在等待，触到边界之后开始逐层返回，答案在回来的路上才凑齐。</figcaption>
+</figure>
+<p>向下时，三层调用叠在一起，谁也没有算出结果；<code>factorial(1)</code> 直接返回 1 之后，计算才开始“倒着”发生：<span class="math">2 \times 1 = 2</span>，<span class="math">3 \times 2 = 6</span>。这种后进先出的结构，就是<dfn data-def="程序用来记录“还没结束的函数调用”的后进先出结构：每调用一层就压入一格，返回时弹出。">调用栈</dfn>（call stack）。</p>
+<p>换个比喻：把每一层调用想象成往桌上叠一张卡片，最后放上去的，最先被拿走。栈顶永远是正在执行的那一层，压在下面的都在等它；而 6 这个最终答案，要等所有卡片都被取走之后，才出现在桌面中央。</p>
+<p><mark>递归的答案，是回来的时候才凑齐的。</mark>向下走，是为了找到那个可以开始的地方。</p>
+</section>
+
+<section id="recursion-cost">
+<h2>递归的代价，和它的用武之地</h2>
+<p>递归让代码更接近定义，但它不免费。每向下调用一层，语言都要在调用栈上保存这一层的位置与局部变量；层数越深，占用越多，而调用栈的大小是有限的。Python 干脆给递归深度定了一个上限<span class="note">默认是 1000 层，可以用 <code>sys.getrecursionlimit()</code> 查看。</span>，超过就报错；C、Java 这类语言不规定层数，但栈用完了同样会出错。</p>
+<div class="callout danger">
+  <p>永远到不了终止条件的递归不会“慢慢算”，而是直接失败：Python 抛出 <code>RecursionError</code>，JavaScript 报告调用栈溢出；在 C 这类语言里，栈被耗尽之后程序通常直接崩溃。</p>
+</div>
+<p>所以直白的阶乘，用循环写往往更省内存；而像文件目录遍历、树形结构的遍历这类“结构本身就是嵌套”的问题，递归反而更自然——它和问题的形状对上了。先看阶乘的两种写法：</p>
+<div class="tabs">
+  <div data-tab="递归">
+    <pre data-lang="python"><code>def factorial(n):
+    if n &lt;= 1:
+        return 1
+    return n * factorial(n - 1)</code></pre>
+  </div>
+  <div data-tab="循环">
+    <pre data-lang="python"><code>def factorial(n):
+    result = 1
+    for k in range(2, n + 1):
+        result *= k
+    return result</code></pre>
+  </div>
+</div>
+<p>两种写法结果相同：递归版要叠起 <span class="math">n</span> 层调用，循环版自始至终只用一个变量记录乘积。再看一个结构本身就嵌套的问题。</p>
+<div class="example" id="ex-nested" data-title="嵌套的文件夹">
+  <p>用嵌套列表表示一个文件夹：数字是文件的大小，列表是子文件夹。下面的函数计算总大小。</p>
+  <pre data-lang="python" data-file="total_size.py" data-lines><code>def total_size(item):
+    if isinstance(item, int):
+        return item
+    return sum(total_size(child) for child in item)
+
+print(total_size([120, [40, [8, 2]], 30]))</code></pre>
+  <p>它的终止条件和递归步骤分别在哪几行？最后一行会打印什么？</p>
+  <details class="answer">
+    <summary>解答</summary>
+    <p>终止条件是第 2–3 行：遇到文件（一个数字）就直接返回它的大小。递归步骤是第 4 行：文件夹的大小等于其中每一项的大小之和，而每一项又交给 <code>total_size</code> 自己去算。打印结果是 <span class="math">120 + 40 + 8 + 2 + 30 = 200</span>。</p>
+    <p>文件夹嵌套多少层，这段代码都不用改；换成循环来写，就得自己维护一份“还没处理的文件夹”清单。</p>
+  </details>
+</div>
+<p>反过来，写错的递归通常错在两个关键之一。下面三种写法各会发生什么？先想一想，再点开。</p>
+<details name="recursion-bugs">
+  <summary>如果把递归步骤写成 <code>factorial(n)</code> 而不是 <code>factorial(n - 1)</code>，会发生什么？</summary>
+  <p>每一层调用的问题都没有变小，永远到不了 <code>n &lt;= 1</code> 这条边界。程序会不断向下调用，直到调用栈被耗尽，抛出类似“递归深度超出限制”的错误。这提醒我们：边界写得对还不够，<strong>每次调用都必须真的朝边界移动</strong>。</p>
+</details>
+<details name="recursion-bugs">
+  <summary>如果删掉终止条件，只留下递归步骤呢？</summary>
+  <p>参数会一路减下去：1、0、−1、−2……没有任何一层肯直接给出答案，结果同样是调用栈耗尽。缩小的动作还在，却没有边界接住它。</p>
+</details>
+<details name="recursion-bugs">
+  <summary>如果终止条件写成 <code>n == 1</code>，再调用 <code>factorial(0)</code> 呢？</summary>
+  <p>0 不等于 1，于是继续调用 <code>factorial(-1)</code>、<code>factorial(-2)</code>……参数离 1 越来越远。边界存在，却没有覆盖所有可能到达的输入；写成 <code>n &lt;= 1</code> 才守得住。</p>
+</details>
+<div class="callout note">
+  <p>递归与数学归纳法是同一套思路的两种写法：边界情况对应归纳的起点，递归步骤对应“假设小一号的问题成立，推出当前问题也成立”。能读懂归纳证明的人，通常很快就能读懂递归。</p>
+</div>
+<p>第一讲用<dfn>循环不变式</dfn>说明找最大值为什么正确（<a href="01-what-is-an-algorithm.html#algo-demo"></a>），用的也是这种“从起点一步步推到终点”的推理。</p>
+</section>
+
+<section id="recursion-check">
+<h2>检查你的理解</h2>
+<div class="quiz" data-answer="b">
+  <p>要让这一讲的递归一定能停下来，必要的是哪一条？</p>
+  <ol>
+    <li>只要写了终止条件就行，参数怎么变化无所谓</li>
+    <li>有明确的终止条件，并且每次调用都更接近它</li>
+    <li>递归的层数不超过语言允许的上限</li>
+  </ol>
+  <div class="explain"><p>递归要能正常结束，需要两件事同时成立：有可以直接回答的终止条件，并且每次递归调用都让问题更接近这个终止条件。少任何一条，递归都无法收敛。只写终止条件不够：上一节的反例里边界还在，参数却离它越来越远。层数的上限只管出错时报错，不能让递归自己停下来。</p></div>
+</div>
+<div class="quiz" data-answer="4|四|4次|四次">
+  <p>按本讲的写法调用 <code>factorial(4)</code>，<code>factorial</code> 这个函数一共被调用了几次（含最外层这一次）？</p>
+  <p class="hint">从 <code>factorial(4)</code> 开始，一层层写到命中边界为止。</p>
+  <div class="explain"><p>依次是 <code>factorial(4)</code>、<code>factorial(3)</code>、<code>factorial(2)</code>、<code>factorial(1)</code>，共 4 次；到 <code>factorial(1)</code> 命中边界，不再向下调用。</p></div>
+</div>
+<div class="quiz">
+  <p>不运行代码，写出 <code>factorial(4)</code> 向下调用与向上返回的全过程，再对照解析。</p>
+  <div class="explain"><p>向下：<code>factorial(4)</code> 等 <code>factorial(3)</code>，<code>factorial(3)</code> 等 <code>factorial(2)</code>，<code>factorial(2)</code> 等 <code>factorial(1)</code>。向上：<code>factorial(1)</code> 返回 1，接着是 <span class="math">2 \times 1 = 2</span>、<span class="math">3 \times 2 = 6</span>、<span class="math">4 \times 6 = 24</span>。如果你写下的顺序与此一致，说明已经看懂了<a href="#fig-call-stack"></a>。</p></div>
+</div>
+</section>
+
+<section id="recursion-wrap">
+<h2>把四讲连起来</h2>
+<p>把四讲连起来看：找最大值、二分查找、时间复杂度、递归，练的其实是同一件事——<strong>把问题说清楚，找到结构，再让每一步都有根据。</strong></p>
+<dl>
+  <dt>算法</dt><dd>把问题变成明确、能结束的步骤。见<a href="01-what-is-an-algorithm.html"></a>。</dd>
+  <dt>二分查找</dt><dd>利用有序，让每次比较都排除一半候选。见<a href="02-binary-search.html"></a>。</dd>
+  <dt>复杂度</dt><dd>用增长趋势判断规模变大后还能不能做。见<a href="03-time-complexity.html"></a>。</dd>
+  <dt>递归</dt><dd>用一个更小的同类问题，拼出完整答案。</dd>
+</dl>
+<p><mark>真正理解的标志，是你能用自己的话，把它讲给别人听。</mark>四讲到这里结束，练习才刚开始：</p>
+<ul class="tasks">
+  <li>在学习笔记里，用三句话解释一个最有收获的概念</li>
+  <li>不看讲义，自己写出阶乘的递归版与循环版</li>
+  <li>找一件每天都会做的事，把它写成一段有边界、能验证的步骤</li>
+</ul>
+</section>
+
+<section class="recap">
+<h2>本讲小结</h2>
+<ul>
+  <li>递归把问题拆成一个更小的同类问题，再用它的答案拼出当前答案。</li>
+  <li>终止条件给出终点，缩小的动作保证每一层都在靠近它，两者缺一不可。</li>
+  <li>调用栈后进先出：向下时层层等待，触到边界后才逐层返回。</li>
+  <li>递归有栈深度与内存成本；结构自嵌套的问题用它更自然，简单重复则未必。</li>
+</ul>
+</section>
+</main>
+</body>
+</html>
